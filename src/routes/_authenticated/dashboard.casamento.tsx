@@ -35,7 +35,6 @@ function WeddingPage() {
     partner_2_name: "",
     wedding_date: "",
     ceremony_time: "",
-    reception_time: "",
     venue_name: "",
     venue_address: "",
     city: "",
@@ -51,7 +50,6 @@ function WeddingPage() {
       partner_2_name: couple.partner_2_name,
       wedding_date: wedding?.wedding_date ?? "",
       ceremony_time: wedding?.ceremony_time?.slice(0, 5) ?? "",
-      reception_time: wedding?.reception_time?.slice(0, 5) ?? "",
       venue_name: wedding?.venue_name ?? "",
       venue_address: wedding?.venue_address ?? "",
       city: wedding?.city ?? "",
@@ -74,7 +72,6 @@ function WeddingPage() {
         upsertWedding(couple.id, {
           wedding_date: form.wedding_date || null,
           ceremony_time: form.ceremony_time || null,
-          reception_time: form.reception_time || null,
           venue_name: form.venue_name || null,
           venue_address: form.venue_address || null,
           city: form.city || null,
@@ -129,10 +126,9 @@ function WeddingPage() {
 
           <section className="surface-card space-y-4 p-6">
             <h2 className="font-display text-xl font-semibold">Cerimônia</h2>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Data" type="date" value={form.wedding_date} onChange={set("wedding_date")} />
               <Field label="Cerimônia" type="time" value={form.ceremony_time} onChange={set("ceremony_time")} />
-              <Field label="Recepção" type="time" value={form.reception_time} onChange={set("reception_time")} />
             </div>
             <Field label="Local" value={form.venue_name} onChange={set("venue_name")} />
             <Field label="Endereço" value={form.venue_address} onChange={set("venue_address")} />

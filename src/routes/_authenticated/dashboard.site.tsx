@@ -44,7 +44,6 @@ function SiteEditorPage() {
     primary_color: "#8a6f52",
     secondary_color: "#c9b8a3",
     background_color: "#fbf8f4",
-    welcome_message: "",
   });
 
   useEffect(() => {
@@ -54,7 +53,6 @@ function SiteEditorPage() {
       primary_color: settings.primary_color ?? "#8a6f52",
       secondary_color: settings.secondary_color ?? "#c9b8a3",
       background_color: settings.background_color ?? "#fbf8f4",
-      welcome_message: settings.welcome_message ?? "",
     });
   }, [settings]);
 
@@ -169,16 +167,6 @@ function SiteEditorPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="welcome">Mensagem de boas-vindas</Label>
-                <Textarea
-                  id="welcome"
-                  rows={3}
-                  value={style.welcome_message}
-                  onChange={(e) => setStyle((s) => ({ ...s, welcome_message: e.target.value }))}
-                  placeholder="Estamos muito felizes em compartilhar este momento com vocês."
-                />
-              </div>
             </div>
           </TabsContent>
 
