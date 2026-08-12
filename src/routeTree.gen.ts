@@ -15,6 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
+import { Route as AuthenticatedDashboardCasamentoRouteImport } from './routes/_authenticated/dashboard.casamento'
+import { Route as AuthenticatedDashboardSiteRouteImport } from './routes/_authenticated/dashboard.site'
 import { Route as ApiPublicPaymentsMercadopagoWebhookRouteImport } from './routes/api/public/payments/mercadopago-webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +49,24 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardCasamentoRoute =
+  AuthenticatedDashboardCasamentoRouteImport.update({
+    id: '/casamento',
+    path: '/casamento',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardSiteRoute =
+  AuthenticatedDashboardSiteRouteImport.update({
+    id: '/site',
+    path: '/site',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const ApiPublicPaymentsMercadopagoWebhookRoute =
   ApiPublicPaymentsMercadopagoWebhookRouteImport.update({
     id: '/api/public/payments/mercadopago-webhook',
@@ -57,16 +78,21 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
+  '/dashboard/site': typeof AuthenticatedDashboardSiteRoute
+  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/payments/mercadopago-webhook': typeof ApiPublicPaymentsMercadopagoWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
+  '/dashboard/site': typeof AuthenticatedDashboardSiteRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/api/public/payments/mercadopago-webhook': typeof ApiPublicPaymentsMercadopagoWebhookRoute
 }
 export interface FileRoutesById {
@@ -75,8 +101,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
+  '/_authenticated/dashboard/site': typeof AuthenticatedDashboardSiteRoute
+  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/payments/mercadopago-webhook': typeof ApiPublicPaymentsMercadopagoWebhookRoute
 }
 export interface FileRouteTypes {
@@ -87,14 +116,19 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/onboarding'
+    | '/dashboard/casamento'
+    | '/dashboard/site'
+    | '/dashboard/'
     | '/api/public/payments/mercadopago-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/reset-password'
-    | '/dashboard'
     | '/onboarding'
+    | '/dashboard/casamento'
+    | '/dashboard/site'
+    | '/dashboard'
     | '/api/public/payments/mercadopago-webhook'
   id:
     | '__root__'
@@ -104,6 +138,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/_authenticated/dashboard/casamento'
+    | '/_authenticated/dashboard/site'
+    | '/_authenticated/dashboard/'
     | '/api/public/payments/mercadopago-webhook'
   fileRoutesById: FileRoutesById
 }
@@ -159,6 +196,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/': {
+      id: '/_authenticated/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/casamento': {
+      id: '/_authenticated/dashboard/casamento'
+      path: '/casamento'
+      fullPath: '/dashboard/casamento'
+      preLoaderRoute: typeof AuthenticatedDashboardCasamentoRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/site': {
+      id: '/_authenticated/dashboard/site'
+      path: '/site'
+      fullPath: '/dashboard/site'
+      preLoaderRoute: typeof AuthenticatedDashboardSiteRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/api/public/payments/mercadopago-webhook': {
       id: '/api/public/payments/mercadopago-webhook'
       path: '/api/public/payments/mercadopago-webhook'
@@ -169,13 +227,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardCasamentoRoute: typeof AuthenticatedDashboardCasamentoRoute
+  AuthenticatedDashboardSiteRoute: typeof AuthenticatedDashboardSiteRoute
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+}
+
+const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
+  {
+    AuthenticatedDashboardCasamentoRoute: AuthenticatedDashboardCasamentoRoute,
+    AuthenticatedDashboardSiteRoute: AuthenticatedDashboardSiteRoute,
+    AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  }
+
+const AuthenticatedDashboardRouteWithChildren =
+  AuthenticatedDashboardRoute._addFileChildren(
+    AuthenticatedDashboardRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
