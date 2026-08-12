@@ -17,6 +17,9 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardCasamentoRouteImport } from './routes/_authenticated/dashboard.casamento'
+import { Route as AuthenticatedDashboardConvidadosRouteImport } from './routes/_authenticated/dashboard.convidados'
+import { Route as AuthenticatedDashboardPresentesRouteImport } from './routes/_authenticated/dashboard.presentes'
+import { Route as AuthenticatedDashboardRsvpRouteImport } from './routes/_authenticated/dashboard.rsvp'
 import { Route as AuthenticatedDashboardSiteRouteImport } from './routes/_authenticated/dashboard.site'
 import { Route as ApiPublicPaymentsMercadopagoWebhookRouteImport } from './routes/api/public/payments/mercadopago-webhook'
 
@@ -61,6 +64,24 @@ const AuthenticatedDashboardCasamentoRoute =
     path: '/casamento',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardConvidadosRoute =
+  AuthenticatedDashboardConvidadosRouteImport.update({
+    id: '/convidados',
+    path: '/convidados',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardPresentesRoute =
+  AuthenticatedDashboardPresentesRouteImport.update({
+    id: '/presentes',
+    path: '/presentes',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRsvpRoute =
+  AuthenticatedDashboardRsvpRouteImport.update({
+    id: '/rsvp',
+    path: '/rsvp',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardSiteRoute =
   AuthenticatedDashboardSiteRouteImport.update({
     id: '/site',
@@ -81,6 +102,9 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
+  '/dashboard/convidados': typeof AuthenticatedDashboardConvidadosRoute
+  '/dashboard/presentes': typeof AuthenticatedDashboardPresentesRoute
+  '/dashboard/rsvp': typeof AuthenticatedDashboardRsvpRoute
   '/dashboard/site': typeof AuthenticatedDashboardSiteRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/payments/mercadopago-webhook': typeof ApiPublicPaymentsMercadopagoWebhookRoute
@@ -91,6 +115,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
+  '/dashboard/convidados': typeof AuthenticatedDashboardConvidadosRoute
+  '/dashboard/presentes': typeof AuthenticatedDashboardPresentesRoute
+  '/dashboard/rsvp': typeof AuthenticatedDashboardRsvpRoute
   '/dashboard/site': typeof AuthenticatedDashboardSiteRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/api/public/payments/mercadopago-webhook': typeof ApiPublicPaymentsMercadopagoWebhookRoute
@@ -104,6 +131,9 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
+  '/_authenticated/dashboard/convidados': typeof AuthenticatedDashboardConvidadosRoute
+  '/_authenticated/dashboard/presentes': typeof AuthenticatedDashboardPresentesRoute
+  '/_authenticated/dashboard/rsvp': typeof AuthenticatedDashboardRsvpRoute
   '/_authenticated/dashboard/site': typeof AuthenticatedDashboardSiteRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/api/public/payments/mercadopago-webhook': typeof ApiPublicPaymentsMercadopagoWebhookRoute
@@ -117,6 +147,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/dashboard/casamento'
+    | '/dashboard/convidados'
+    | '/dashboard/presentes'
+    | '/dashboard/rsvp'
     | '/dashboard/site'
     | '/dashboard/'
     | '/api/public/payments/mercadopago-webhook'
@@ -127,6 +160,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/onboarding'
     | '/dashboard/casamento'
+    | '/dashboard/convidados'
+    | '/dashboard/presentes'
+    | '/dashboard/rsvp'
     | '/dashboard/site'
     | '/dashboard'
     | '/api/public/payments/mercadopago-webhook'
@@ -139,6 +175,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/_authenticated/dashboard/casamento'
+    | '/_authenticated/dashboard/convidados'
+    | '/_authenticated/dashboard/presentes'
+    | '/_authenticated/dashboard/rsvp'
     | '/_authenticated/dashboard/site'
     | '/_authenticated/dashboard/'
     | '/api/public/payments/mercadopago-webhook'
@@ -210,6 +249,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCasamentoRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/convidados': {
+      id: '/_authenticated/dashboard/convidados'
+      path: '/convidados'
+      fullPath: '/dashboard/convidados'
+      preLoaderRoute: typeof AuthenticatedDashboardConvidadosRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/presentes': {
+      id: '/_authenticated/dashboard/presentes'
+      path: '/presentes'
+      fullPath: '/dashboard/presentes'
+      preLoaderRoute: typeof AuthenticatedDashboardPresentesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/rsvp': {
+      id: '/_authenticated/dashboard/rsvp'
+      path: '/rsvp'
+      fullPath: '/dashboard/rsvp'
+      preLoaderRoute: typeof AuthenticatedDashboardRsvpRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/site': {
       id: '/_authenticated/dashboard/site'
       path: '/site'
@@ -229,6 +289,9 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardCasamentoRoute: typeof AuthenticatedDashboardCasamentoRoute
+  AuthenticatedDashboardConvidadosRoute: typeof AuthenticatedDashboardConvidadosRoute
+  AuthenticatedDashboardPresentesRoute: typeof AuthenticatedDashboardPresentesRoute
+  AuthenticatedDashboardRsvpRoute: typeof AuthenticatedDashboardRsvpRoute
   AuthenticatedDashboardSiteRoute: typeof AuthenticatedDashboardSiteRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -236,6 +299,10 @@ interface AuthenticatedDashboardRouteChildren {
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardCasamentoRoute: AuthenticatedDashboardCasamentoRoute,
+    AuthenticatedDashboardConvidadosRoute:
+      AuthenticatedDashboardConvidadosRoute,
+    AuthenticatedDashboardPresentesRoute: AuthenticatedDashboardPresentesRoute,
+    AuthenticatedDashboardRsvpRoute: AuthenticatedDashboardRsvpRoute,
     AuthenticatedDashboardSiteRoute: AuthenticatedDashboardSiteRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
