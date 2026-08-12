@@ -1,0 +1,786 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.15"
+  }
+  public: {
+    Tables: {
+      couples: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          owner_id: string
+          partner_1_name: string
+          partner_2_name: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          owner_id: string
+          partner_1_name: string
+          partner_2_name: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          owner_id?: string
+          partner_1_name?: string
+          partner_2_name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couples_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_items: {
+        Row: {
+          active: boolean
+          available_quantity: number
+          couple_id: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          quantity: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          available_quantity?: number
+          couple_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number
+          quantity?: number
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          available_quantity?: number
+          couple_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          quantity?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_items_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_orders: {
+        Row: {
+          amount: number
+          couple_id: string
+          created_at: string
+          gift_item_id: string
+          guest_email: string
+          guest_name: string
+          id: string
+          message: string | null
+          quantity: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          couple_id: string
+          created_at?: string
+          gift_item_id: string
+          guest_email: string
+          guest_name: string
+          id?: string
+          message?: string | null
+          quantity?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          couple_id?: string
+          created_at?: string
+          gift_item_id?: string
+          guest_email?: string
+          guest_name?: string
+          id?: string
+          message?: string | null
+          quantity?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_orders_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gift_orders_gift_item_id_fkey"
+            columns: ["gift_item_id"]
+            isOneToOne: false
+            referencedRelation: "gift_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guests: {
+        Row: {
+          couple_id: string
+          created_at: string
+          email: string | null
+          group_name: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          plus_one_allowed: boolean
+          plus_one_name: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          email?: string | null
+          group_name?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          plus_one_allowed?: boolean
+          plus_one_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          email?: string | null
+          group_name?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          plus_one_allowed?: boolean
+          plus_one_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          couple_id: string
+          created_at: string
+          gateway: string
+          gateway_payment_id: string | null
+          id: string
+          order_id: string
+          paid_at: string | null
+          payment_method: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          couple_id: string
+          created_at?: string
+          gateway?: string
+          gateway_payment_id?: string | null
+          id?: string
+          order_id: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          couple_id?: string
+          created_at?: string
+          gateway?: string
+          gateway_payment_id?: string | null
+          id?: string
+          order_id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "gift_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photos: {
+        Row: {
+          caption: string | null
+          category: string
+          couple_id: string
+          created_at: string
+          id: string
+          position: number
+          public_url: string
+          section_id: string | null
+          storage_path: string
+        }
+        Insert: {
+          caption?: string | null
+          category?: string
+          couple_id: string
+          created_at?: string
+          id?: string
+          position?: number
+          public_url: string
+          section_id?: string | null
+          storage_path: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string
+          couple_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          public_url?: string
+          section_id?: string | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photos_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "website_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rsvps: {
+        Row: {
+          couple_id: string
+          created_at: string
+          dietary_restrictions: string | null
+          guest_id: string
+          guests_count: number
+          id: string
+          message: string | null
+          responded_at: string
+          response: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          dietary_restrictions?: string | null
+          guest_id: string
+          guests_count?: number
+          id?: string
+          message?: string | null
+          responded_at?: string
+          response: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          dietary_restrictions?: string | null
+          guest_id?: string
+          guests_count?: number
+          id?: string
+          message?: string | null
+          responded_at?: string
+          response?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rsvps_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rsvps_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: true
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          couple_id: string
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          gateway: string | null
+          gateway_subscription_id: string | null
+          id: string
+          plan: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          gateway?: string | null
+          gateway_subscription_id?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          gateway?: string | null
+          gateway_subscription_id?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      website_sections: {
+        Row: {
+          content: string | null
+          couple_id: string
+          created_at: string
+          id: string
+          position: number
+          section_type: string
+          settings: Json
+          title: string | null
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          content?: string | null
+          couple_id: string
+          created_at?: string
+          id?: string
+          position?: number
+          section_type: string
+          settings?: Json
+          title?: string | null
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          content?: string | null
+          couple_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          section_type?: string
+          settings?: Json
+          title?: string | null
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_sections_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      website_settings: {
+        Row: {
+          background_color: string
+          body_font: string
+          couple_id: string
+          created_at: string
+          custom_domain: string | null
+          heading_font: string
+          hero_image_url: string | null
+          id: string
+          music_url: string | null
+          primary_color: string
+          published: boolean
+          secondary_color: string
+          template_slug: string
+          updated_at: string
+        }
+        Insert: {
+          background_color?: string
+          body_font?: string
+          couple_id: string
+          created_at?: string
+          custom_domain?: string | null
+          heading_font?: string
+          hero_image_url?: string | null
+          id?: string
+          music_url?: string | null
+          primary_color?: string
+          published?: boolean
+          secondary_color?: string
+          template_slug?: string
+          updated_at?: string
+        }
+        Update: {
+          background_color?: string
+          body_font?: string
+          couple_id?: string
+          created_at?: string
+          custom_domain?: string | null
+          heading_font?: string
+          hero_image_url?: string | null
+          id?: string
+          music_url?: string | null
+          primary_color?: string
+          published?: boolean
+          secondary_color?: string
+          template_slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_settings_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: true
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weddings: {
+        Row: {
+          ceremony_time: string | null
+          city: string | null
+          couple_id: string
+          created_at: string
+          description: string | null
+          dress_code: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          state: string | null
+          title: string | null
+          updated_at: string
+          venue_address: string | null
+          venue_name: string | null
+          wedding_date: string | null
+        }
+        Insert: {
+          ceremony_time?: string | null
+          city?: string | null
+          couple_id: string
+          created_at?: string
+          description?: string | null
+          dress_code?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          state?: string | null
+          title?: string | null
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string | null
+          wedding_date?: string | null
+        }
+        Update: {
+          ceremony_time?: string | null
+          city?: string | null
+          couple_id?: string
+          created_at?: string
+          description?: string | null
+          dress_code?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          state?: string | null
+          title?: string | null
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string | null
+          wedding_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weddings_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: true
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      couple_is_published: { Args: { _couple_id: string }; Returns: boolean }
+      create_gift_order: {
+        Args: {
+          _gift_item_id: string
+          _guest_email: string
+          _guest_name: string
+          _message?: string
+          _quantity: number
+        }
+        Returns: Json
+      }
+      owns_couple: { Args: { _couple_id: string }; Returns: boolean }
+      submit_rsvp: {
+        Args: {
+          _dietary?: string
+          _email: string
+          _guests_count: number
+          _message?: string
+          _name: string
+          _plus_one_name?: string
+          _response: string
+          _slug: string
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
