@@ -58,6 +58,36 @@ export type Database = {
           },
         ]
       }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          key: string
+          label: string
+          min_plan: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key: string
+          label: string
+          min_plan?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          label?: string
+          min_plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gift_items: {
         Row: {
           active: boolean
@@ -67,9 +97,12 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          is_quota: boolean
           name: string
           price: number
           quantity: number
+          quota_label: string | null
+          total_goal: number | null
           type: string
           updated_at: string
         }
@@ -81,9 +114,12 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_quota?: boolean
           name: string
           price?: number
           quantity?: number
+          quota_label?: string | null
+          total_goal?: number | null
           type?: string
           updated_at?: string
         }
@@ -95,9 +131,12 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_quota?: boolean
           name?: string
           price?: number
           quantity?: number
+          quota_label?: string | null
+          total_goal?: number | null
           type?: string
           updated_at?: string
         }
@@ -168,6 +207,47 @@ export type Database = {
           },
         ]
       }
+      guest_messages: {
+        Row: {
+          author_name: string
+          couple_id: string
+          created_at: string
+          id: string
+          message: string
+          photo_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          author_name: string
+          couple_id: string
+          created_at?: string
+          id?: string
+          message: string
+          photo_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          couple_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          photo_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_messages_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests: {
         Row: {
           couple_id: string
@@ -214,6 +294,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "guests_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          couple_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          body?: string | null
+          couple_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          body?: string | null
+          couple_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_couple_id_fkey"
             columns: ["couple_id"]
             isOneToOne: false
             referencedRelation: "couples"
@@ -407,6 +525,38 @@ export type Database = {
           },
         ]
       }
+      site_events: {
+        Row: {
+          couple_id: string
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_events_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           couple_id: string
@@ -453,6 +603,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
       website_sections: {
         Row: {
@@ -505,15 +676,21 @@ export type Database = {
         Row: {
           background_color: string
           body_font: string
+          border_radius: string
+          button_style: string
+          card_style: string
           couple_id: string
           created_at: string
           custom_domain: string | null
           heading_font: string
           hero_image_url: string | null
           id: string
+          layout_width: string
+          messages_enabled: boolean
           music_url: string | null
           primary_color: string
           published: boolean
+          rsvp_mode: string
           secondary_color: string
           template_slug: string
           updated_at: string
@@ -521,15 +698,21 @@ export type Database = {
         Insert: {
           background_color?: string
           body_font?: string
+          border_radius?: string
+          button_style?: string
+          card_style?: string
           couple_id: string
           created_at?: string
           custom_domain?: string | null
           heading_font?: string
           hero_image_url?: string | null
           id?: string
+          layout_width?: string
+          messages_enabled?: boolean
           music_url?: string | null
           primary_color?: string
           published?: boolean
+          rsvp_mode?: string
           secondary_color?: string
           template_slug?: string
           updated_at?: string
@@ -537,15 +720,21 @@ export type Database = {
         Update: {
           background_color?: string
           body_font?: string
+          border_radius?: string
+          button_style?: string
+          card_style?: string
           couple_id?: string
           created_at?: string
           custom_domain?: string | null
           heading_font?: string
           hero_image_url?: string | null
           id?: string
+          layout_width?: string
+          messages_enabled?: boolean
           music_url?: string | null
           primary_color?: string
           published?: boolean
+          rsvp_mode?: string
           secondary_color?: string
           template_slug?: string
           updated_at?: string
@@ -571,6 +760,10 @@ export type Database = {
           id: string
           latitude: number | null
           longitude: number | null
+          our_story: string | null
+          reception_address: string | null
+          reception_time: string | null
+          reception_venue_name: string | null
           state: string | null
           title: string | null
           updated_at: string
@@ -588,6 +781,10 @@ export type Database = {
           id?: string
           latitude?: number | null
           longitude?: number | null
+          our_story?: string | null
+          reception_address?: string | null
+          reception_time?: string | null
+          reception_venue_name?: string | null
           state?: string | null
           title?: string | null
           updated_at?: string
@@ -605,6 +802,10 @@ export type Database = {
           id?: string
           latitude?: number | null
           longitude?: number | null
+          our_story?: string | null
+          reception_address?: string | null
+          reception_time?: string | null
+          reception_venue_name?: string | null
           state?: string | null
           title?: string | null
           updated_at?: string
@@ -638,7 +839,24 @@ export type Database = {
         }
         Returns: Json
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff: { Args: never; Returns: boolean }
       owns_couple: { Args: { _couple_id: string }; Returns: boolean }
+      submit_guest_message: {
+        Args: {
+          _author_name: string
+          _message: string
+          _photo_url?: string
+          _slug: string
+        }
+        Returns: Json
+      }
       submit_rsvp: {
         Args: {
           _dietary?: string
@@ -652,9 +870,13 @@ export type Database = {
         }
         Returns: Json
       }
+      track_site_event: {
+        Args: { _event_type: string; _metadata?: Json; _slug: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "admin" | "root"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -781,6 +1003,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "admin", "root"],
+    },
   },
 } as const
