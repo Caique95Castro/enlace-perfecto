@@ -14,6 +14,13 @@ export type GiftItem = T["gift_items"]["Row"];
 export type GiftOrder = T["gift_orders"]["Row"];
 export type Payment = T["payments"]["Row"];
 export type Subscription = T["subscriptions"]["Row"];
+export type GuestMessage = T["guest_messages"]["Row"];
+export type FeatureFlag = T["feature_flags"]["Row"];
+export type SiteEvent = T["site_events"]["Row"];
+export type Notification = T["notifications"]["Row"];
+export type MessageStatus = "pending" | "approved" | "hidden";
+export type AppRole = "user" | "admin" | "root";
+export type PlanTier = "free" | "premium" | "premium_plus";
 
 export type GuestStatus = "pending" | "confirmed" | "declined";
 export type SectionType =

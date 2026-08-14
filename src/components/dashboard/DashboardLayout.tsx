@@ -7,8 +7,10 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquareHeart,
   Palette,
   Settings,
+  ShieldCheck,
   Users,
   MailCheck,
 } from "lucide-react";
@@ -16,6 +18,7 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoles } from "@/hooks/usePlatform";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -24,10 +27,12 @@ const NAV = [
   { to: "/dashboard/site", label: "Meu site", icon: Palette },
   { to: "/dashboard/convidados", label: "Convidados", icon: Users },
   { to: "/dashboard/rsvp", label: "RSVP", icon: MailCheck },
+  { to: "/dashboard/mensagens", label: "Mural de mensagens", icon: MessageSquareHeart },
   { to: "/dashboard/presentes", label: "Lista de presentes", icon: Gift },
   { to: "/dashboard/pagamentos", label: "Pagamentos", icon: CreditCard },
   { to: "/dashboard/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
+
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
