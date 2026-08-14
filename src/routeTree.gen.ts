@@ -14,12 +14,14 @@ import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardCasamentoRouteImport } from './routes/_authenticated/dashboard.casamento'
 import { Route as AuthenticatedDashboardConfiguracoesRouteImport } from './routes/_authenticated/dashboard.configuracoes'
 import { Route as AuthenticatedDashboardConvidadosRouteImport } from './routes/_authenticated/dashboard.convidados'
+import { Route as AuthenticatedDashboardMensagensRouteImport } from './routes/_authenticated/dashboard.mensagens'
 import { Route as AuthenticatedDashboardPagamentosRouteImport } from './routes/_authenticated/dashboard.pagamentos'
 import { Route as AuthenticatedDashboardPresentesRouteImport } from './routes/_authenticated/dashboard.presentes'
 import { Route as AuthenticatedDashboardRsvpRouteImport } from './routes/_authenticated/dashboard.rsvp'
@@ -49,6 +51,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -82,6 +89,12 @@ const AuthenticatedDashboardConvidadosRoute =
   AuthenticatedDashboardConvidadosRouteImport.update({
     id: '/convidados',
     path: '/convidados',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardMensagensRoute =
+  AuthenticatedDashboardMensagensRouteImport.update({
+    id: '/mensagens',
+    path: '/mensagens',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardPagamentosRoute =
@@ -120,11 +133,13 @@ export interface FileRoutesByFullPath {
   '/$slug': typeof SlugRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
   '/dashboard/configuracoes': typeof AuthenticatedDashboardConfiguracoesRoute
   '/dashboard/convidados': typeof AuthenticatedDashboardConvidadosRoute
+  '/dashboard/mensagens': typeof AuthenticatedDashboardMensagensRoute
   '/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
   '/dashboard/presentes': typeof AuthenticatedDashboardPresentesRoute
   '/dashboard/rsvp': typeof AuthenticatedDashboardRsvpRoute
@@ -137,10 +152,12 @@ export interface FileRoutesByTo {
   '/$slug': typeof SlugRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
   '/dashboard/configuracoes': typeof AuthenticatedDashboardConfiguracoesRoute
   '/dashboard/convidados': typeof AuthenticatedDashboardConvidadosRoute
+  '/dashboard/mensagens': typeof AuthenticatedDashboardMensagensRoute
   '/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
   '/dashboard/presentes': typeof AuthenticatedDashboardPresentesRoute
   '/dashboard/rsvp': typeof AuthenticatedDashboardRsvpRoute
@@ -155,11 +172,13 @@ export interface FileRoutesById {
   '/$slug': typeof SlugRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/dashboard/casamento': typeof AuthenticatedDashboardCasamentoRoute
   '/_authenticated/dashboard/configuracoes': typeof AuthenticatedDashboardConfiguracoesRoute
   '/_authenticated/dashboard/convidados': typeof AuthenticatedDashboardConvidadosRoute
+  '/_authenticated/dashboard/mensagens': typeof AuthenticatedDashboardMensagensRoute
   '/_authenticated/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
   '/_authenticated/dashboard/presentes': typeof AuthenticatedDashboardPresentesRoute
   '/_authenticated/dashboard/rsvp': typeof AuthenticatedDashboardRsvpRoute
@@ -174,11 +193,13 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/auth'
     | '/reset-password'
+    | '/admin'
     | '/dashboard'
     | '/onboarding'
     | '/dashboard/casamento'
     | '/dashboard/configuracoes'
     | '/dashboard/convidados'
+    | '/dashboard/mensagens'
     | '/dashboard/pagamentos'
     | '/dashboard/presentes'
     | '/dashboard/rsvp'
@@ -191,10 +212,12 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/auth'
     | '/reset-password'
+    | '/admin'
     | '/onboarding'
     | '/dashboard/casamento'
     | '/dashboard/configuracoes'
     | '/dashboard/convidados'
+    | '/dashboard/mensagens'
     | '/dashboard/pagamentos'
     | '/dashboard/presentes'
     | '/dashboard/rsvp'
@@ -208,11 +231,13 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/_authenticated/dashboard/casamento'
     | '/_authenticated/dashboard/configuracoes'
     | '/_authenticated/dashboard/convidados'
+    | '/_authenticated/dashboard/mensagens'
     | '/_authenticated/dashboard/pagamentos'
     | '/_authenticated/dashboard/presentes'
     | '/_authenticated/dashboard/rsvp'
@@ -267,6 +292,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -307,6 +339,13 @@ declare module '@tanstack/react-router' {
       path: '/convidados'
       fullPath: '/dashboard/convidados'
       preLoaderRoute: typeof AuthenticatedDashboardConvidadosRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/mensagens': {
+      id: '/_authenticated/dashboard/mensagens'
+      path: '/mensagens'
+      fullPath: '/dashboard/mensagens'
+      preLoaderRoute: typeof AuthenticatedDashboardMensagensRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/pagamentos': {
@@ -351,6 +390,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardCasamentoRoute: typeof AuthenticatedDashboardCasamentoRoute
   AuthenticatedDashboardConfiguracoesRoute: typeof AuthenticatedDashboardConfiguracoesRoute
   AuthenticatedDashboardConvidadosRoute: typeof AuthenticatedDashboardConvidadosRoute
+  AuthenticatedDashboardMensagensRoute: typeof AuthenticatedDashboardMensagensRoute
   AuthenticatedDashboardPagamentosRoute: typeof AuthenticatedDashboardPagamentosRoute
   AuthenticatedDashboardPresentesRoute: typeof AuthenticatedDashboardPresentesRoute
   AuthenticatedDashboardRsvpRoute: typeof AuthenticatedDashboardRsvpRoute
@@ -365,6 +405,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardConfiguracoesRoute,
     AuthenticatedDashboardConvidadosRoute:
       AuthenticatedDashboardConvidadosRoute,
+    AuthenticatedDashboardMensagensRoute: AuthenticatedDashboardMensagensRoute,
     AuthenticatedDashboardPagamentosRoute:
       AuthenticatedDashboardPagamentosRoute,
     AuthenticatedDashboardPresentesRoute: AuthenticatedDashboardPresentesRoute,
@@ -379,11 +420,13 @@ const AuthenticatedDashboardRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
