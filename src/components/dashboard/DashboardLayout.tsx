@@ -36,10 +36,15 @@ const NAV = [
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isAdmin } = useRoles();
+  const items = [
+    ...NAV,
+    ...(isAdmin ? [{ to: "/admin", label: "Administração", icon: ShieldCheck } as const] : []),
+  ];
 
   return (
     <nav className="flex flex-col gap-1">
-      {NAV.map((item) => {
+      {items.map((item) => {
         const active =
           "exact" in item && item.exact ? pathname === item.to : pathname.startsWith(item.to);
         return (
@@ -62,6 +67,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
     </nav>
   );
 }
+
 
 export function DashboardLayout({
   title,
