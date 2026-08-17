@@ -61,9 +61,13 @@ export const Route = createFileRoute("/$slug")({
 
 function PublicSite() {
   const data = Route.useLoaderData();
-  const { couple, wedding, settings, sections, photos, gifts } = data;
+  const { couple, wedding, settings, sections, photos, gifts, messages } = data;
   const visible = new Set(sections.filter((s) => s.visible).map((s) => s.section_type as SectionType));
   const sectionOf = (type: SectionType) => sections.find((s) => s.section_type === type);
+
+  useEffect(() => {
+    void trackSiteEvent(couple.slug, "page_view");
+  }, [couple.slug]);
 
   const style = {
     ["--site-primary" as string]: settings.primary_color,
@@ -72,6 +76,7 @@ function PublicSite() {
   } as React.CSSProperties;
 
   const gallery = photos.filter((p) => p.category === "gallery");
+
 
   return (
     <div style={style} className="min-h-screen text-neutral-800">
