@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { getPublicWedding } from "@/lib/public-site.functions";
 import { submitRsvp } from "@/services/guests";
+import { submitGuestMessage, trackSiteEvent } from "@/services/messages";
 import { createGiftOrder } from "@/services/gifts";
 import { createPayment } from "@/lib/payments.functions";
 import { countdownTo, formatCurrency, formatDateLong, formatTime } from "@/lib/format";
@@ -168,6 +169,16 @@ function PublicSite() {
         </Section>
       ) : null}
 
+      {visible.has("message") ? (
+        <Section
+          title={sectionOf("message")?.title ?? "Mural de mensagens"}
+          tinted
+          primary={settings.secondary_color}
+        >
+          <MessageBoard slug={couple.slug} messages={messages} />
+        </Section>
+      ) : null}
+
       <footer className="px-4 py-12 text-center text-sm">
         <p className="font-display text-2xl">{couple.display_name}</p>
         <p className="mt-2 opacity-70">{sectionOf("footer")?.content ?? "Esperamos você!"}</p>
@@ -175,6 +186,7 @@ function PublicSite() {
     </div>
   );
 }
+
 
 function Section({
   title,
