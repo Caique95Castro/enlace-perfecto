@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { getPublicWedding } from "@/lib/public-site.functions";
 import { submitRsvp } from "@/services/guests";
+import { submitGuestMessage, trackSiteEvent } from "@/services/messages";
 import { createGiftOrder } from "@/services/gifts";
 import { createPayment } from "@/lib/payments.functions";
 import { countdownTo, formatCurrency, formatDateLong, formatTime } from "@/lib/format";
@@ -61,9 +62,13 @@ export const Route = createFileRoute("/$slug")({
 
 function PublicSite() {
   const data = Route.useLoaderData();
-  const { couple, wedding, settings, sections, photos, gifts } = data;
+  const { couple, wedding, settings, sections, photos, gifts, messages } = data;
   const visible = new Set(sections.filter((s) => s.visible).map((s) => s.section_type as SectionType));
   const sectionOf = (type: SectionType) => sections.find((s) => s.section_type === type);
+
+  useEffect(() => {
+    void trackSiteEvent(couple.slug, "page_view");
+  }, [couple.slug]);
 
   const style = {
     ["--site-primary" as string]: settings.primary_color,
@@ -72,6 +77,7 @@ function PublicSite() {
   } as React.CSSProperties;
 
   const gallery = photos.filter((p) => p.category === "gallery");
+
 
   return (
     <div style={style} className="min-h-screen text-neutral-800">
@@ -163,6 +169,16 @@ function PublicSite() {
         </Section>
       ) : null}
 
+      {visible.has("message") ? (
+        <Section
+          title={sectionOf("message")?.title ?? "Mural de mensagens"}
+          tinted
+          primary={settings.secondary_color}
+        >
+          <MessageBoard slug={couple.slug} messages={messages} />
+        </Section>
+      ) : null}
+
       <footer className="px-4 py-12 text-center text-sm">
         <p className="font-display text-2xl">{couple.display_name}</p>
         <p className="mt-2 opacity-70">{sectionOf("footer")?.content ?? "Esperamos você!"}</p>
@@ -170,6 +186,7 @@ function PublicSite() {
     </div>
   );
 }
+
 
 function Section({
   title,
@@ -424,5 +441,94 @@ function GiftCard({
         )}
       </div>
     </article>
+  );
+}
+
+function MessageBoard({
+  slug,
+  messages,
+}: {
+  slug: string;
+  messages: { id: string; author_name: string; message: string; photo_url: string | null }[];
+}) {
+  const [form, setForm] = useState({ name: "", message: "" });
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  async function send() {
+    if (!form.name.trim() || !form.message.trim()) {
+      toast.error("Preencha seu nome e a mensagem.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await submitGuestMessage({
+        slug,
+        authorName: form.name.trim(),
+        message: form.message.trim(),
+      });
+      setSent(true);
+      setForm({ name: "", message: "" });
+      toast.success("Mensagem enviada! Ela aparece após a aprovação dos noivos.");
+    } catch {
+      toast.error("Não foi possível enviar sua mensagem.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="mx-auto max-w-xl space-y-4 rounded-xl bg-white/80 p-6 backdrop-blur">
+        {sent ? (
+          <p className="text-center">Obrigado pelo carinho! Sua mensagem foi enviada aos noivos. 💌</p>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="msg-name">Seu nome</Label>
+              <Input
+                id="msg-name"
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="msg-text">Deixe um recado</Label>
+              <Textarea
+                id="msg-text"
+                rows={4}
+                value={form.message}
+                onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+              />
+            </div>
+            <Button className="w-full" onClick={send} disabled={busy}>
+              {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+              Enviar mensagem
+            </Button>
+          </>
+        )}
+      </div>
+
+      {messages.length > 0 ? (
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {messages.map((m) => (
+            <li key={m.id} className="rounded-xl bg-white/70 p-5">
+              <div className="flex items-center gap-3">
+                {m.photo_url ? (
+                  <img
+                    src={m.photo_url}
+                    alt={`Foto enviada por ${m.author_name}`}
+                    loading="lazy"
+                    className="size-10 rounded-full object-cover"
+                  />
+                ) : null}
+                <p className="font-medium">{m.author_name}</p>
+              </div>
+              <p className="mt-3 whitespace-pre-line text-sm opacity-80">{m.message}</p>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }

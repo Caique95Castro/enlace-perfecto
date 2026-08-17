@@ -38,11 +38,10 @@ function useAdminOverview(enabled: boolean) {
     queryKey: ["admin-overview"],
     enabled,
     queryFn: async () => {
-      const [couples, settings, orders, roles] = await Promise.all([
-        supabase.from("couples").select("id, display_name, slug, status, created_at").order("created_at", { ascending: false }),
+      const [couples, settings, orders] = await Promise.all([
+        supabase.from("couples").select("id, owner_id, display_name, slug, status, created_at").order("created_at", { ascending: false }),
         supabase.from("website_settings").select("couple_id, published, template_slug"),
         supabase.from("gift_orders").select("amount, status"),
-        supabase.from("user_roles").select("user_id, role"),
       ]);
       if (couples.error) throw couples.error;
       const published = (settings.data ?? []).filter((s) => s.published);
@@ -52,9 +51,9 @@ function useAdminOverview(enabled: boolean) {
         publishedIds: new Set(published.map((s) => s.couple_id)),
         publishedCount: published.length,
         revenue: paid.reduce((sum, o) => sum + Number(o.amount ?? 0), 0),
-        userCount: new Set((roles.data ?? []).map((r) => r.user_id)).size,
-        staff: (roles.data ?? []).filter((r) => r.role !== "user"),
+        userCount: new Set((couples.data ?? []).map((c) => c.owner_id)).size,
       };
+
     },
   });
 }

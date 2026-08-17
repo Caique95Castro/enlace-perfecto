@@ -116,4 +116,6 @@ export type PublicWeddingData = {
   sections: WebsiteSection[];
   photos: Photo[];
   gifts: GiftItem[];
+  messages: Pick<GuestMessage, "id" | "author_name" | "message" | "photo_url" | "created_at">[];
 };
+

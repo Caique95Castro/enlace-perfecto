@@ -42,7 +42,7 @@ export const getPublicWedding = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!settings) return null;
 
-    const [wedding, sections, photos, gifts] = await Promise.all([
+    const [wedding, sections, photos, gifts, messages] = await Promise.all([
       supabase.from("weddings").select("*").eq("couple_id", couple.id).maybeSingle(),
       supabase
         .from("website_sections")
@@ -60,6 +60,13 @@ export const getPublicWedding = createServerFn({ method: "GET" })
         .eq("couple_id", couple.id)
         .eq("active", true)
         .order("created_at", { ascending: true }),
+      supabase
+        .from("guest_messages")
+        .select("id, author_name, message, photo_url, created_at")
+        .eq("couple_id", couple.id)
+        .eq("status", "approved")
+        .order("created_at", { ascending: false })
+        .limit(60),
     ]);
 
     return {
@@ -69,5 +76,7 @@ export const getPublicWedding = createServerFn({ method: "GET" })
       sections: sections.data ?? [],
       photos: photos.data ?? [],
       gifts: gifts.data ?? [],
+      messages: messages.data ?? [],
     };
   });
+
