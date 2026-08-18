@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          couple_id: string | null
+          created_at: string
+          entity: string
+          entity_id: string | null
+          id: string
+          metadata: Json
+          result: string
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          couple_id?: string | null
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          id?: string
+          metadata?: Json
+          result?: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          couple_id?: string | null
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          metadata?: Json
+          result?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       couples: {
         Row: {
           created_at: string
@@ -54,6 +101,65 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          address: string | null
+          couple_id: string
+          created_at: string
+          description: string | null
+          event_date: string | null
+          event_type: string
+          id: string
+          maps_url: string | null
+          name: string
+          position: number
+          start_time: string | null
+          updated_at: string
+          venue_name: string | null
+          visible: boolean
+        }
+        Insert: {
+          address?: string | null
+          couple_id: string
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          event_type?: string
+          id?: string
+          maps_url?: string | null
+          name: string
+          position?: number
+          start_time?: string | null
+          updated_at?: string
+          venue_name?: string | null
+          visible?: boolean
+        }
+        Update: {
+          address?: string | null
+          couple_id?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          event_type?: string
+          id?: string
+          maps_url?: string | null
+          name?: string
+          position?: number
+          start_time?: string | null
+          updated_at?: string
+          venue_name?: string | null
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
             referencedColumns: ["id"]
           },
         ]
@@ -301,6 +407,50 @@ export type Database = {
           },
         ]
       }
+      info_items: {
+        Row: {
+          content: string | null
+          couple_id: string
+          created_at: string
+          icon: string | null
+          id: string
+          position: number
+          title: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          content?: string | null
+          couple_id: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          position?: number
+          title: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          content?: string | null
+          couple_id?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          position?: number
+          title?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "info_items_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
@@ -335,6 +485,47 @@ export type Database = {
             columns: ["couple_id"]
             isOneToOne: false
             referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_events: {
+        Row: {
+          created_at: string
+          gateway: string
+          gateway_event_id: string
+          gateway_payment_id: string | null
+          id: string
+          order_id: string | null
+          payload: Json
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          gateway?: string
+          gateway_event_id: string
+          gateway_payment_id?: string | null
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          status: string
+        }
+        Update: {
+          created_at?: string
+          gateway?: string
+          gateway_event_id?: string
+          gateway_payment_id?: string | null
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "gift_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -557,6 +748,50 @@ export type Database = {
           },
         ]
       }
+      story_moments: {
+        Row: {
+          couple_id: string
+          created_at: string
+          description: string | null
+          id: string
+          moment_date: string | null
+          photo_url: string | null
+          position: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          moment_date?: string | null
+          photo_url?: string | null
+          position?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          moment_date?: string | null
+          photo_url?: string | null
+          position?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_moments_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           couple_id: string
@@ -749,6 +984,50 @@ export type Database = {
           },
         ]
       }
+      wedding_party: {
+        Row: {
+          couple_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          photo_url: string | null
+          position: number
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          position?: number
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          position?: number
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wedding_party_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weddings: {
         Row: {
           ceremony_time: string | null
@@ -828,6 +1107,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_payment_event: {
+        Args: {
+          _gateway_event_id: string
+          _gateway_payment_id: string
+          _method?: string
+          _order_id: string
+          _payload?: Json
+          _status: string
+        }
+        Returns: Json
+      }
       couple_is_published: { Args: { _couple_id: string }; Returns: boolean }
       create_gift_order: {
         Args: {
