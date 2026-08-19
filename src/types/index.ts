@@ -24,40 +24,49 @@ export type PlanTier = "free" | "premium" | "premium_plus";
 
 export type GuestStatus = "pending" | "confirmed" | "declined";
 export type SectionType =
+  | "header"
   | "hero"
   | "story"
   | "countdown"
   | "gallery"
   | "event"
+  | "wedding_party"
   | "location"
   | "dress_code"
+  | "info"
   | "rsvp"
   | "gifts"
   | "message"
   | "footer";
 
 export const SECTION_LABELS: Record<SectionType, string> = {
-  hero: "Capa",
+  header: "Cabeçalho e navegação",
+  hero: "Capa (banner)",
   story: "Nossa história",
   countdown: "Contagem regressiva",
   gallery: "Galeria",
-  event: "Cerimônia",
+  event: "Cerimônia e recepção",
+  wedding_party: "Padrinhos e madrinhas",
   location: "Local",
   dress_code: "Dress code",
+  info: "Informações importantes",
   rsvp: "Confirmação de presença",
   gifts: "Lista de presentes",
-  message: "Mensagem aos convidados",
+  message: "Mural de recados",
   footer: "Rodapé",
 };
 
 export const SECTION_ORDER: SectionType[] = [
+  "header",
   "hero",
   "countdown",
   "story",
   "gallery",
   "event",
+  "wedding_party",
   "location",
   "dress_code",
+  "info",
   "rsvp",
   "gifts",
   "message",
