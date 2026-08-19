@@ -2,19 +2,27 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Eye, EyeOff, ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
+import {
+  ExternalLink,
+  ImagePlus,
+  Loader2,
+  Monitor,
+  Save,
+  Smartphone,
+  Trash2,
+  X,
+} from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SectionsBuilder } from "@/components/dashboard/SectionsBuilder";
 import { useCouple, usePhotos, useSections, useSettings } from "@/hooks/useWeddingData";
-import { updateSection, upsertSettings } from "@/services/couples";
+import { ensureSections, upsertSettings } from "@/services/couples";
 import { deletePhoto, uploadPhoto } from "@/services/storage";
-import { SECTION_LABELS, TEMPLATES, type SectionType } from "@/types";
+import { TEMPLATES } from "@/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/site")({
@@ -38,6 +46,18 @@ function SiteEditorPage() {
   const { data: photos = [] } = usePhotos(couple?.id);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewMode, setPreviewMode] = useState<"mobile" | "desktop">("mobile");
+
+  // Garante que todas as seções previstas existam para este casal (inclui seções novas
+  // criadas depois que a conta foi aberta), assim que soubermos o couple.id.
+  useEffect(() => {
+    if (!couple?.id) return;
+    void ensureSections(couple.id).then(() => {
+      void queryClient.invalidateQueries({ queryKey: ["sections", couple.id] });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [couple?.id]);
 
   const [style, setStyle] = useState({
     template_slug: "elegante",
@@ -92,12 +112,27 @@ function SiteEditorPage() {
       title="Meu site"
       description="Personalize o visual, o conteúdo das seções e as fotos."
       actions={
-        <Button onClick={saveStyle} disabled={saving || !couple}>
-          {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-          Salvar aparência
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setPreviewOpen(true)} disabled={!couple?.slug}>
+            <ExternalLink className="size-4" />
+            Visualizar site
+          </Button>
+          <Button onClick={saveStyle} disabled={saving || !couple}>
+            {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            Salvar aparência
+          </Button>
+        </div>
       }
     >
+      {couple?.slug && previewOpen ? (
+        <SitePreviewModal
+          slug={couple.slug}
+          mode={previewMode}
+          onModeChange={setPreviewMode}
+          onClose={() => setPreviewOpen(false)}
+        />
+      ) : null}
+
       {isLoading ? (
         <Skeleton className="h-96 rounded-xl" />
       ) : (
@@ -166,16 +201,11 @@ function SiteEditorPage() {
                   onChange={(v) => setStyle((s) => ({ ...s, background_color: v }))}
                 />
               </div>
-
             </div>
           </TabsContent>
 
           <TabsContent value="secoes" className="mt-5">
-            <div className="space-y-3">
-              {sections.map((section) => (
-                <SectionEditor key={section.id} section={section} />
-              ))}
-            </div>
+            {couple ? <SectionsBuilder coupleId={couple.id} sections={sections} /> : null}
           </TabsContent>
 
           <TabsContent value="fotos" className="mt-5">
@@ -229,71 +259,76 @@ function SiteEditorPage() {
   );
 }
 
-function SectionEditor({
-  section,
+/** Pré-visualização do site publicado, em iframe, com alternância mobile/desktop. */
+function SitePreviewModal({
+  slug,
+  mode,
+  onModeChange,
+  onClose,
 }: {
-  section: { id: string; section_type: string; title: string | null; content: string | null; visible: boolean };
+  slug: string;
+  mode: "mobile" | "desktop";
+  onModeChange: (mode: "mobile" | "desktop") => void;
+  onClose: () => void;
 }) {
-  const queryClient = useQueryClient();
-  const [title, setTitle] = useState(section.title ?? "");
-  const [content, setContent] = useState(section.content ?? "");
-  const [visible, setVisible] = useState(section.visible);
-  const [saving, setSaving] = useState(false);
-
-  async function save(next?: { visible?: boolean }) {
-    setSaving(true);
-    try {
-      await updateSection(section.id, {
-        title,
-        content: content || null,
-        visible: next?.visible ?? visible,
-      });
-      await queryClient.invalidateQueries({ queryKey: ["sections"] });
-    } catch {
-      toast.error("Não foi possível salvar a seção.");
-    } finally {
-      setSaving(false);
-    }
-  }
+  const url = `/${slug}`;
 
   return (
-    <div className="surface-card p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {visible ? (
-            <Eye className="size-4 text-primary" />
-          ) : (
-            <EyeOff className="size-4 text-muted-foreground" />
-          )}
-          <p className="font-medium">
-            {SECTION_LABELS[section.section_type as SectionType] ?? section.section_type}
-          </p>
+    <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-3 sm:p-6">
+      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-xl bg-background shadow-xl">
+        <div className="flex items-center justify-between gap-3 border-b border-border p-3">
+          <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+            <button
+              type="button"
+              onClick={() => onModeChange("mobile")}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                mode === "mobile" ? "bg-background shadow-sm" : "text-muted-foreground",
+              )}
+            >
+              <Smartphone className="size-4" />
+              Celular
+            </button>
+            <button
+              type="button"
+              onClick={() => onModeChange("desktop")}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                mode === "desktop" ? "bg-background shadow-sm" : "text-muted-foreground",
+              )}
+            >
+              <Monitor className="size-4" />
+              Desktop
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <a href={url} target="_blank" rel="noreferrer">
+              <Button size="sm" variant="outline">
+                <ExternalLink className="size-4" />
+                Abrir em nova aba
+              </Button>
+            </a>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={onClose}
+              aria-label="Fechar pré-visualização"
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
         </div>
-        <Switch
-          checked={visible}
-          onCheckedChange={(v) => {
-            setVisible(v);
-            void save({ visible: v });
-          }}
-          aria-label="Mostrar seção"
-        />
-      </div>
-
-      <div className="mt-4 grid gap-3 lg:grid-cols-3">
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título" />
-        <Textarea
-          className="lg:col-span-2"
-          rows={2}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Texto da seção"
-        />
-      </div>
-      <div className="mt-3 flex justify-end">
-        <Button size="sm" variant="outline" onClick={() => save()} disabled={saving}>
-          {saving ? <Loader2 className="size-4 animate-spin" /> : null}
-          Salvar seção
-        </Button>
+        <div className="flex flex-1 items-center justify-center overflow-auto bg-muted/40 p-4">
+          <iframe
+            key={mode}
+            src={url}
+            title="Pré-visualização do site"
+            className={cn(
+              "h-full rounded-lg border border-border bg-white shadow-sm",
+              mode === "mobile" ? "w-[390px]" : "w-full",
+            )}
+          />
+        </div>
       </div>
     </div>
   );
