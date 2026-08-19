@@ -19,7 +19,9 @@ import { submitGuestMessage, trackSiteEvent } from "@/services/messages";
 import { createGiftOrder } from "@/services/gifts";
 import { createPayment } from "@/lib/payments.functions";
 import { countdownTo, formatCurrency, formatDateLong, formatTime } from "@/lib/format";
-import type { SectionType } from "@/types";
+import { fieldBool, fieldText, paragraphsOf } from "@/lib/sections";
+import { cn } from "@/lib/utils";
+import type { SectionType, WebsiteSection } from "@/types";
 
 export const Route = createFileRoute("/$slug")({
   loader: async ({ params }) => {
@@ -43,7 +45,10 @@ export const Route = createFileRoute("/$slug")({
     ];
     const image = loaderData.settings.hero_image_url;
     if (image?.startsWith("https://")) {
-      meta.push({ property: "og:image", content: image }, { name: "twitter:image", content: image });
+      meta.push(
+        { property: "og:image", content: image },
+        { name: "twitter:image", content: image },
+      );
     }
     return { meta };
   },
@@ -63,7 +68,9 @@ export const Route = createFileRoute("/$slug")({
 function PublicSite() {
   const data = Route.useLoaderData();
   const { couple, wedding, settings, sections, photos, gifts, messages } = data;
-  const visible = new Set(sections.filter((s) => s.visible).map((s) => s.section_type as SectionType));
+  const visible = new Set(
+    sections.filter((s) => s.visible).map((s) => s.section_type as SectionType),
+  );
   const sectionOf = (type: SectionType) => sections.find((s) => s.section_type === type);
 
   useEffect(() => {
@@ -78,26 +85,66 @@ function PublicSite() {
 
   const gallery = photos.filter((p) => p.category === "gallery");
 
+  const headerSection = sectionOf("header");
+  const heroSection = sectionOf("hero");
+  const storySection = sectionOf("story");
+
+  const heroImage = fieldText(heroSection, "image_url") || settings.hero_image_url;
+  const heroEyebrow = fieldText(heroSection, "eyebrow") || "Vamos nos casar";
+  const heroHeadline = fieldText(heroSection, "headline");
+  const heroSubheadline = fieldText(heroSection, "subheadline");
+  const heroDateText = fieldText(heroSection, "date_text") || formatDateLong(wedding?.wedding_date);
+  const heroOverlay = fieldBool(heroSection, "overlay", true);
+  const heroCtaEnabled = fieldBool(heroSection, "cta_enabled", true);
+  const heroCtaLabel = fieldText(heroSection, "cta_label") || "Confirmar presença";
+  const heroCtaLink = fieldText(heroSection, "cta_link") || "#rsvp";
+  const heroCtaSecondaryLabel = fieldText(heroSection, "cta_secondary_label");
+  const heroCtaSecondaryLink = fieldText(heroSection, "cta_secondary_link") || "#presentes";
+
+  const storyParagraphs = paragraphsOf(
+    fieldText(storySection, "text") || storySection?.content || wedding?.description || "",
+  );
+  const storyImage = fieldText(storySection, "image_url");
 
   return (
     <div style={style} className="min-h-screen text-neutral-800">
+      {visible.has("header") ? <SiteHeader section={headerSection} couple={couple} /> : null}
+
       <header className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-4 text-center">
-        {settings.hero_image_url ? (
+        {heroImage ? (
           <>
             <img
-              src={settings.hero_image_url}
+              src={heroImage}
               alt={`Foto de ${couple.display_name}`}
               className="absolute inset-0 size-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/35" />
+            {heroOverlay ? <div className="absolute inset-0 bg-black/35" /> : null}
           </>
         ) : null}
-        <div className={settings.hero_image_url ? "relative text-white" : "relative"}>
-          <p className="text-xs uppercase tracking-[0.35em]">Vamos nos casar</p>
+        <div className={heroImage ? "relative text-white" : "relative"}>
+          <p className="text-xs uppercase tracking-[0.35em]">{heroEyebrow}</p>
           <h1 className="mt-4 font-display text-5xl font-semibold sm:text-6xl">
-            {couple.partner_1_name} &amp; {couple.partner_2_name}
+            {heroHeadline || `${couple.partner_1_name} & ${couple.partner_2_name}`}
           </h1>
-          <p className="mt-4 text-lg">{formatDateLong(wedding?.wedding_date)}</p>
+          {heroSubheadline ? <p className="mt-3 text-base opacity-90">{heroSubheadline}</p> : null}
+          <p className="mt-4 text-lg">{heroDateText}</p>
+          {heroCtaEnabled ? (
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+              <a href={heroCtaLink}>
+                <Button>{heroCtaLabel}</Button>
+              </a>
+              {heroCtaSecondaryLabel ? (
+                <a href={heroCtaSecondaryLink}>
+                  <Button
+                    variant="outline"
+                    className={heroImage ? "bg-white/10 text-white" : undefined}
+                  >
+                    {heroCtaSecondaryLabel}
+                  </Button>
+                </a>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -105,11 +152,23 @@ function PublicSite() {
         <Countdown date={wedding.wedding_date} time={wedding.ceremony_time} />
       ) : null}
 
-      {visible.has("story") && (wedding?.description || sectionOf("story")?.content) ? (
-        <Section title={sectionOf("story")?.title ?? "Nossa história"}>
-          <p className="mx-auto max-w-2xl whitespace-pre-line text-center leading-relaxed">
-            {sectionOf("story")?.content || wedding?.description}
-          </p>
+      {visible.has("story") && (storyParagraphs.length > 0 || storyImage) ? (
+        <Section title={storySection?.title ?? "Nossa história"}>
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
+            {storyImage ? (
+              <img
+                src={storyImage}
+                alt={`Foto de ${couple.display_name}`}
+                loading="lazy"
+                className="aspect-[4/3] w-full max-w-md rounded-xl object-cover"
+              />
+            ) : null}
+            <div className="space-y-4 text-center leading-relaxed">
+              {storyParagraphs.length > 0
+                ? storyParagraphs.map((p, i) => <p key={i}>{p}</p>)
+                : null}
+            </div>
+          </div>
         </Section>
       ) : null}
 
@@ -154,7 +213,11 @@ function PublicSite() {
       ) : null}
 
       {visible.has("rsvp") ? (
-        <Section title={sectionOf("rsvp")?.title ?? "Confirme sua presença"} tinted primary={settings.secondary_color}>
+        <Section
+          title={sectionOf("rsvp")?.title ?? "Confirme sua presença"}
+          tinted
+          primary={settings.secondary_color}
+        >
           <RsvpForm slug={couple.slug} />
         </Section>
       ) : null}
@@ -187,6 +250,62 @@ function PublicSite() {
   );
 }
 
+function SiteHeader({
+  section,
+  couple,
+}: {
+  section: WebsiteSection | null | undefined;
+  couple: { partner_1_name: string; partner_2_name: string };
+}) {
+  const [scrolled, setScrolled] = useState(false);
+  const brand =
+    fieldText(section, "brand") || `${couple.partner_1_name} & ${couple.partner_2_name}`;
+  const logoUrl = fieldText(section, "logo_url");
+  const sticky = fieldBool(section, "sticky", true);
+  const transparent = fieldBool(section, "transparent", true);
+  const showNav = fieldBool(section, "show_nav", true);
+  const textColor = fieldText(section, "text_color");
+  const ctaLabel = fieldText(section, "cta_label") || "Confirmar presença";
+  const ctaLink = fieldText(section, "cta_link") || "#rsvp";
+
+  useEffect(() => {
+    if (!transparent) return;
+    function onScroll() {
+      setScrolled(window.scrollY > 40);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [transparent]);
+
+  const isDark = transparent && !scrolled;
+
+  return (
+    <div
+      className={cn(
+        "z-40 flex items-center justify-between px-4 py-4 sm:px-8",
+        sticky ? "sticky top-0" : "relative",
+        isDark ? "bg-transparent" : "bg-background/95 shadow-sm backdrop-blur",
+      )}
+      style={isDark && textColor ? { color: textColor } : undefined}
+    >
+      <div className="flex items-center gap-2">
+        {logoUrl ? <img src={logoUrl} alt={brand} className="h-8 w-auto object-contain" /> : null}
+        <span className="font-display text-lg font-semibold">{brand}</span>
+      </div>
+      {showNav ? (
+        <a href={ctaLink}>
+          <Button
+            size="sm"
+            variant={isDark ? "outline" : "default"}
+            className={isDark ? "bg-white/10" : undefined}
+          >
+            {ctaLabel}
+          </Button>
+        </a>
+      ) : null}
+    </div>
+  );
+}
 
 function Section({
   title,
@@ -205,7 +324,9 @@ function Section({
       style={tinted && primary ? { backgroundColor: `${primary}33` } : undefined}
     >
       <div className="mx-auto max-w-4xl">
-        <h2 className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl">{title}</h2>
+        <h2 className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl">
+          {title}
+        </h2>
         {children}
       </div>
     </section>
@@ -278,9 +399,7 @@ function RsvpForm({ slug }: { slug: string }) {
   }
 
   if (done) {
-    return (
-      <p className="text-center text-lg">Recebemos sua resposta. Obrigado por avisar! 💌</p>
-    );
+    return <p className="text-center text-lg">Recebemos sua resposta. Obrigado por avisar! 💌</p>;
   }
 
   return (
@@ -362,7 +481,13 @@ function GiftCard({
   gift,
   primary,
 }: {
-  gift: { id: string; name: string; description: string | null; price: number; image_url: string | null };
+  gift: {
+    id: string;
+    name: string;
+    description: string | null;
+    price: number;
+    image_url: string | null;
+  };
   primary: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -400,9 +525,17 @@ function GiftCard({
   return (
     <article className="overflow-hidden rounded-xl bg-white/80 shadow-sm">
       {gift.image_url ? (
-        <img src={gift.image_url} alt={gift.name} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+        <img
+          src={gift.image_url}
+          alt={gift.name}
+          loading="lazy"
+          className="aspect-[4/3] w-full object-cover"
+        />
       ) : (
-        <div className="flex aspect-[4/3] items-center justify-center" style={{ backgroundColor: `${primary}22` }}>
+        <div
+          className="flex aspect-[4/3] items-center justify-center"
+          style={{ backgroundColor: `${primary}22` }}
+        >
           <Gift className="size-8" style={{ color: primary }} />
         </div>
       )}
@@ -481,7 +614,9 @@ function MessageBoard({
     <div className="space-y-8">
       <div className="mx-auto max-w-xl space-y-4 rounded-xl bg-white/80 p-6 backdrop-blur">
         {sent ? (
-          <p className="text-center">Obrigado pelo carinho! Sua mensagem foi enviada aos noivos. 💌</p>
+          <p className="text-center">
+            Obrigado pelo carinho! Sua mensagem foi enviada aos noivos. 💌
+          </p>
         ) : (
           <>
             <div className="space-y-2">
