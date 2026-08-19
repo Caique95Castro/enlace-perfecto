@@ -182,3 +182,34 @@ export async function reorderSections(sections: { id: string; position: number }
 export function sectionByType(sections: WebsiteSection[], type: SectionType) {
   return sections.find((s) => s.section_type === type) ?? null;
 }
+
+/** Garante que todas as seções previstas existam para o casal (inclui seções novas). */
+export async function ensureSections(coupleId: string): Promise<WebsiteSection[]> {
+  const existing = await listSections(coupleId);
+  const have = new Set(existing.map((s) => s.section_type));
+  const missing = SECTION_ORDER.filter((t) => !have.has(t));
+  if (missing.length > 0) {
+    const base = existing.length;
+    const rows = missing.map((type, i) => ({
+      couple_id: coupleId,
+      section_type: type,
+      title: SECTION_LABELS[type],
+      content: null as string | null,
+      position: base + i,
+      visible: true,
+    }));
+    const { error } = await supabase.from("website_sections").insert(rows);
+    if (error) throw error;
+    return listSections(coupleId);
+  }
+  return existing;
+}
+
+/** Salva os campos dinâmicos (jsonb) de uma seção. */
+export async function updateSectionSettings(
+  id: string,
+  settings: Record<string, unknown>,
+  values?: Partial<WebsiteSection>,
+): Promise<WebsiteSection> {
+  return updateSection(id, { ...(values ?? {}), settings: settings as never });
+}
