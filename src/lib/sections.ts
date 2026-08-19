@@ -16,14 +16,28 @@ export type FieldDef = {
  * então o conteúdo do site público sempre vem do banco — nunca de texto fixo no código.
  */
 export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
+  header: [
+    { key: "brand", label: "Nome exibido no topo", type: "text", placeholder: "Ana & João" },
+    { key: "logo_url", label: "Logo (opcional)", type: "image" },
+    { key: "sticky", label: "Menu fixo ao rolar", type: "switch", fallback: true },
+    { key: "transparent", label: "Fundo transparente sobre a capa", type: "switch", fallback: true },
+    { key: "text_color", label: "Cor do texto do menu", type: "text", placeholder: "#ffffff" },
+    { key: "show_nav", label: "Mostrar links de navegação", type: "switch", fallback: true },
+    { key: "cta_label", label: "Botão do topo", type: "text", placeholder: "Confirmar presença" },
+    { key: "cta_link", label: "Link do botão do topo", type: "url", placeholder: "#rsvp" },
+  ],
   hero: [
     { key: "eyebrow", label: "Chamada curta", type: "text", placeholder: "Vamos nos casar" },
     { key: "headline", label: "Título", type: "text", placeholder: "Nomes do casal" },
     { key: "subheadline", label: "Subtítulo", type: "text" },
-    { key: "image_url", label: "Imagem de capa (URL)", type: "image" },
+    { key: "date_text", label: "Data exibida (deixe vazio para usar a data do casamento)", type: "text" },
+    { key: "image_url", label: "Imagem de fundo", type: "image" },
+    { key: "overlay", label: "Escurecer imagem de fundo", type: "switch", fallback: true },
     { key: "cta_enabled", label: "Mostrar botão", type: "switch", fallback: true },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
     { key: "cta_link", label: "Link do botão", type: "url", placeholder: "#rsvp" },
+    { key: "cta_secondary_label", label: "Texto do 2º botão", type: "text", placeholder: "Ver presentes" },
+    { key: "cta_secondary_link", label: "Link do 2º botão", type: "url", placeholder: "#presentes" },
   ],
   countdown: [
     { key: "subtitle", label: "Subtítulo", type: "text" },
@@ -33,9 +47,19 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "show_seconds", label: "Mostrar segundos", type: "switch", fallback: true },
   ],
   story: [
-    { key: "text", label: "Nossa história", type: "textarea" },
-    { key: "image_url", label: "Imagem (URL)", type: "image" },
+    { key: "text", label: "Nossa história (use linhas em branco para separar parágrafos)", type: "textarea" },
+    { key: "image_url", label: "Imagem", type: "image" },
+    { key: "show_gallery", label: "Mostrar fotos da categoria história", type: "switch", fallback: true },
     { key: "layout", label: "Layout (centro / lado)", type: "text", placeholder: "centro" },
+  ],
+  wedding_party: [
+    { key: "description", label: "Descrição", type: "textarea" },
+    { key: "groom_side_label", label: "Título do lado do noivo", type: "text", placeholder: "Padrinhos" },
+    { key: "bride_side_label", label: "Título do lado da noiva", type: "text", placeholder: "Madrinhas" },
+  ],
+  info: [
+    { key: "description", label: "Descrição", type: "textarea" },
+    { key: "notes", label: "Informações importantes (uma por linha)", type: "textarea" },
   ],
   event: [
     { key: "venue_name", label: "Local da cerimônia", type: "text" },
