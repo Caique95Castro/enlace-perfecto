@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMyCouple, getSettings, getWedding, listSections } from "@/services/couples";
 import { listGuests } from "@/services/guests";
 import { listGifts, listOrders } from "@/services/gifts";
+import { listMessages } from "@/services/messages";
 import { listPhotos } from "@/services/storage";
 
 export function useCouple() {
@@ -60,6 +61,14 @@ export function usePhotos(coupleId: string | undefined) {
   return useQuery({
     queryKey: ["photos", coupleId],
     queryFn: () => listPhotos(coupleId!),
+    enabled: Boolean(coupleId),
+  });
+}
+
+export function useMessages(coupleId: string | undefined) {
+  return useQuery({
+    queryKey: ["messages", coupleId],
+    queryFn: () => listMessages(coupleId!),
     enabled: Boolean(coupleId),
   });
 }
