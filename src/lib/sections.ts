@@ -115,3 +115,19 @@ export function fieldBool(
   const value = sectionSettings(section)[key];
   return typeof value === "boolean" ? value : fallback;
 }
+
+/** Quebra um texto livre em parágrafos (linhas em branco separam blocos). */
+export function paragraphsOf(text: string): string[] {
+  return text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+/** Linhas de uma lista simples (uma por linha). */
+export function linesOf(text: string): string[] {
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
