@@ -13,15 +13,16 @@ import { createServerFn } from "@tanstack/react-start";
 export type PaymentMethod = "pix" | "credit_card" | "debit_card";
 
 export type CreatePaymentResult = {
-  status: "pending_integration" | "created";
+  status: "pending_integration" | "created" | "error";
   checkoutUrl: string | null;
   message: string;
 };
 
 export const createPayment = createServerFn({ method: "POST" })
-  .inputValidator((data: { orderId: string; method: PaymentMethod }) => ({
+  .inputValidator((data: { orderId: string; method: PaymentMethod; origin?: string }) => ({
     orderId: String(data.orderId),
     method: data.method,
+    origin: data.origin ? String(data.origin) : "",
   }))
   .handler(async ({ data }): Promise<CreatePaymentResult> => {
     const token = process.env["MERCADOPAGO_ACCESS_TOKEN"];
@@ -34,6 +35,7 @@ export const createPayment = createServerFn({ method: "POST" })
       };
     }
 
+    const origin = data.origin || process.env["PUBLIC_SITE_URL"] || "";
     const { createMercadoPagoPreference } = await import("./payments.server");
-    return createMercadoPagoPreference(data.orderId, data.method, token);
+    return createMercadoPagoPreference(data.orderId, data.method, token, origin);
   });
