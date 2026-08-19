@@ -2,6 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getMyRoles, type AppRole } from "@/services/roles";
 import { listFeatureFlags } from "@/services/flags";
 import { listMessages } from "@/services/messages";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  canUseFeature,
+  effectivePlan,
+  isBillable,
+  limitsFor,
+  withinLimit,
+} from "@/lib/entitlements";
 
 /** Papéis do usuário logado — a autorização real é feita no banco (RLS + is_staff). */
 export function useRoles() {
