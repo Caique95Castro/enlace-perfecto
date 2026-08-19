@@ -34,3 +34,41 @@ export function useMessages(coupleId: string | undefined) {
     enabled: Boolean(coupleId),
   });
 }
+
+/**
+ * Plano efetivo, limites e liberação de recursos do casal logado.
+ * Conta ROOT: plano máximo, sem cobrança e sem limites.
+ */
+export function useEntitlements(coupleId: string | undefined) {
+  const { isRoot, isAdmin, isLoading: rolesLoading } = useRoles();
+  const { data: flags = [], isLoading: flagsLoading } = useFeatureFlags();
+
+  const subscription = useQuery({
+    queryKey: ["subscription", coupleId],
+    enabled: Boolean(coupleId) && !isRoot,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("plan, status")
+        .eq("couple_id", coupleId!)
+        .in("status", ["active", "trialing"])
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const plan = effectivePlan(subscription.data?.plan, isRoot);
+  const limits = limitsFor(plan, isRoot);
+
+  return {
+    isLoading: rolesLoading || flagsLoading || subscription.isLoading,
+    isRoot,
+    isAdmin,
+    plan,
+    limits,
+    billable: isBillable(isRoot),
+    can: (key: string) => canUseFeature(key, flags, plan, isRoot),
+    within: (current: number, limit: number) => withinLimit(current, limit, isRoot),
+  };
+}
