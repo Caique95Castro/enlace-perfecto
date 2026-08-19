@@ -1118,6 +1118,10 @@ export type Database = {
         }
         Returns: Json
       }
+      can_use_feature: {
+        Args: { _couple_id: string; _key: string }
+        Returns: boolean
+      }
       couple_is_published: { Args: { _couple_id: string }; Returns: boolean }
       create_gift_order: {
         Args: {
@@ -1129,6 +1133,7 @@ export type Database = {
         }
         Returns: Json
       }
+      effective_plan: { Args: { _couple_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1136,8 +1141,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_root: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       owns_couple: { Args: { _couple_id: string }; Returns: boolean }
+      plan_rank: { Args: { _plan: string }; Returns: number }
       submit_guest_message: {
         Args: {
           _author_name: string
@@ -1164,6 +1171,7 @@ export type Database = {
         Args: { _event_type: string; _metadata?: Json; _slug: string }
         Returns: undefined
       }
+      user_is_root: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "user" | "admin" | "root"
