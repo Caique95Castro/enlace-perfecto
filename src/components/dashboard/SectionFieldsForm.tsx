@@ -36,7 +36,6 @@ import { updateSectionSettings } from "@/services/couples";
 import { uploadPhoto } from "@/services/storage";
 import { SECTION_LABELS, type SectionType, type WebsiteSection } from "@/types";
 
-
 /**
  * Formulário com todos os campos editáveis de uma seção (título + campos específicos do tipo).
  * Usado tanto no painel "Seções" (dentro de um card recolhível) quanto no editor visual
@@ -135,6 +134,44 @@ export function FieldInput({
   const [uploading, setUploading] = useState(false);
   const text = typeof value === "string" ? value : "";
 
+  if (field.type === "heading") {
+    return (
+      <div className="border-t border-border pt-4 first:mt-0 first:border-t-0 first:pt-0">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {field.label}
+        </p>
+      </div>
+    );
+  }
+
+  if (field.type === "color") {
+    const current = text || "#000000";
+    return (
+      <div className="space-y-2">
+        <Label htmlFor={id}>{field.label}</Label>
+        <div className="flex items-center gap-2">
+          <input
+            id={id}
+            type="color"
+            value={current}
+            onChange={(e) => onChange(e.target.value)}
+            className="size-9 cursor-pointer rounded-md border border-input bg-transparent p-1"
+          />
+          <Input
+            value={text}
+            placeholder="Cor padrão do tema"
+            onChange={(e) => onChange(e.target.value)}
+          />
+          {text ? (
+            <Button type="button" variant="ghost" size="sm" onClick={() => onChange("")}>
+              Limpar
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   if (field.type === "switch") {
     const checked = typeof value === "boolean" ? value : Boolean(field.fallback);
     return (
@@ -177,7 +214,6 @@ export function FieldInput({
   }
 
   if (field.type === "textarea") {
-
     return (
       <div className="space-y-2">
         <Label htmlFor={id}>{field.label}</Label>
