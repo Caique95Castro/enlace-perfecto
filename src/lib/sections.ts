@@ -1,15 +1,20 @@
 import type { WebsiteSection, SectionType } from "@/types";
 
-export type FieldType = "text" | "textarea" | "switch" | "image" | "url";
+export type FieldType = "text" | "textarea" | "switch" | "image" | "url" | "select" | "order";
+
+export type FieldOption = { value: string; label: string };
 
 export type FieldDef = {
   key: string;
   label: string;
   type: FieldType;
   placeholder?: string;
+  /** Opções para campos do tipo `select`, ou itens arrastáveis para `order`. */
+  options?: FieldOption[];
   /** Valor padrão quando o campo nunca foi preenchido. */
-  fallback?: string | boolean;
+  fallback?: string | boolean | string[];
 };
+
 
 /**
  * Campos próprios de cada seção. Os valores ficam em website_sections.settings (jsonb),
