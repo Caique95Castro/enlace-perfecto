@@ -145,7 +145,39 @@ export function FieldInput({
     );
   }
 
+  if (field.type === "select") {
+    const options = field.options ?? [];
+    const current =
+      typeof value === "string" && value
+        ? value
+        : typeof field.fallback === "string"
+          ? field.fallback
+          : (options[0]?.value ?? "");
+    return (
+      <div className="space-y-2">
+        <Label htmlFor={id}>{field.label}</Label>
+        <Select value={current} onValueChange={onChange}>
+          <SelectTrigger id={id}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  if (field.type === "order") {
+    return <OrderField field={field} value={value} onChange={onChange} />;
+  }
+
   if (field.type === "textarea") {
+
     return (
       <div className="space-y-2">
         <Label htmlFor={id}>{field.label}</Label>
