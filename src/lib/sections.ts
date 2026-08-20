@@ -321,7 +321,7 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
       type: "select",
       fallback: "centralizado",
       options: [
-        { value: "centralizado", label: "Centralizado (sem imagem)" },
+        { value: "centralizado", label: "Centralizado (imagem em cima, se houver)" },
         { value: "imagem_esquerda", label: "Imagem à esquerda" },
         { value: "imagem_direita", label: "Imagem à direita" },
       ],
