@@ -19,10 +19,22 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionsBuilder } from "@/components/dashboard/SectionsBuilder";
-import { useCouple, usePhotos, useSections, useSettings } from "@/hooks/useWeddingData";
+import {
+  VisualSiteEditor,
+  VisualSiteEditorSkeleton,
+} from "@/components/dashboard/VisualSiteEditor";
+import {
+  useCouple,
+  useGifts,
+  usePhotos,
+  useSections,
+  useSettings,
+  useWedding,
+} from "@/hooks/useWeddingData";
 import { ensureSections, upsertSettings } from "@/services/couples";
 import { deletePhoto, uploadPhoto } from "@/services/storage";
 import { TEMPLATES } from "@/types";
+import type { WeddingSiteData } from "@/components/site/WeddingSiteView";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/site")({
@@ -41,9 +53,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/site")({
 function SiteEditorPage() {
   const queryClient = useQueryClient();
   const { data: couple, isLoading } = useCouple();
+  const { data: wedding } = useWedding(couple?.id);
   const { data: settings } = useSettings(couple?.id);
   const { data: sections = [] } = useSections(couple?.id);
   const { data: photos = [] } = usePhotos(couple?.id);
+  const { data: gifts = [] } = useGifts(couple?.id);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -107,6 +121,19 @@ function SiteEditorPage() {
     }
   }
 
+  const siteData: WeddingSiteData | null =
+    couple && settings
+      ? {
+          couple,
+          wedding: wedding ?? null,
+          settings,
+          sections,
+          photos,
+          gifts,
+          messages: [],
+        }
+      : null;
+
   return (
     <DashboardLayout
       title="Meu site"
@@ -136,12 +163,21 @@ function SiteEditorPage() {
       {isLoading ? (
         <Skeleton className="h-96 rounded-xl" />
       ) : (
-        <Tabs defaultValue="aparencia">
+        <Tabs defaultValue="visual">
           <TabsList>
+            <TabsTrigger value="visual">Editor visual</TabsTrigger>
             <TabsTrigger value="aparencia">Aparência</TabsTrigger>
             <TabsTrigger value="secoes">Seções</TabsTrigger>
             <TabsTrigger value="fotos">Fotos</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="visual" className="mt-5">
+            {couple && siteData ? (
+              <VisualSiteEditor coupleId={couple.id} data={siteData} />
+            ) : (
+              <VisualSiteEditorSkeleton />
+            )}
+          </TabsContent>
 
           <TabsContent value="aparencia" className="mt-5">
             <div className="surface-card space-y-6 p-6">
