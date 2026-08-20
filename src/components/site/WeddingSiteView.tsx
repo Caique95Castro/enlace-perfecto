@@ -17,13 +17,32 @@ import { submitGuestMessage } from "@/services/messages";
 import { createGiftOrder } from "@/services/gifts";
 import { createPayment } from "@/lib/payments.functions";
 import { countdownTo, formatCurrency, formatDateLong, formatTime } from "@/lib/format";
-import { fieldBool, fieldText, paragraphsOf } from "@/lib/sections";
+import {
+  fieldBool,
+  fieldChoice,
+  fieldOrder,
+  fieldText,
+  linesOf,
+  paragraphsOf,
+} from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import type { SectionType, WebsiteSection } from "@/types";
 
 /** Tipos de seção que aparecem como blocos independentes e reordenáveis no site. */
 export type SiteBlockType =
-  "hero" | "countdown" | "story" | "gallery" | "event" | "rsvp" | "gifts" | "message";
+  | "hero"
+  | "countdown"
+  | "story"
+  | "gallery"
+  | "event"
+  | "wedding_party"
+  | "location"
+  | "dress_code"
+  | "info"
+  | "rsvp"
+  | "gifts"
+  | "message";
+
 
 export type WeddingSiteData = {
   couple: {
