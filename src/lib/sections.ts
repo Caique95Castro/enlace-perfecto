@@ -55,7 +55,37 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "text", label: "Nossa história (use linhas em branco para separar parágrafos)", type: "textarea" },
     { key: "image_url", label: "Imagem", type: "image" },
     { key: "show_gallery", label: "Mostrar fotos da categoria história", type: "switch", fallback: true },
-    { key: "layout", label: "Layout (centro / lado)", type: "text", placeholder: "centro" },
+    {
+      key: "layout",
+      label: "Disposição da imagem e do texto",
+      type: "select",
+      fallback: "stacked",
+      options: [
+        { value: "stacked", label: "Empilhado (imagem em cima, texto embaixo)" },
+        { value: "side", label: "Lado a lado (imagem e texto na mesma linha)" },
+      ],
+    },
+    {
+      key: "media_order",
+      label: "Arraste para definir a ordem",
+      type: "order",
+      fallback: ["image", "text"],
+      options: [
+        { value: "image", label: "Imagem" },
+        { value: "text", label: "Texto" },
+      ],
+    },
+    {
+      key: "align",
+      label: "Alinhamento do texto",
+      type: "select",
+      fallback: "center",
+      options: [
+        { value: "center", label: "Centralizado" },
+        { value: "left", label: "À esquerda" },
+      ],
+    },
+
   ],
   wedding_party: [
     { key: "description", label: "Descrição", type: "textarea" },
