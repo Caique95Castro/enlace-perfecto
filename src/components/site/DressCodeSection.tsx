@@ -255,8 +255,13 @@ export function DressCodeSection({
         className={cn("px-4", SPACING_CLASS[spacing] ?? SPACING_CLASS["padrao"])}
         style={bgColor ? { backgroundColor: bgColor } : undefined}
       >
-        {layout === "centralizado" || !image ? (
+        {!image ? (
           <div className="mx-auto max-w-2xl">{content}</div>
+        ) : layout === "centralizado" ? (
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-8">
+            <div className="w-full max-w-md">{image}</div>
+            {content}
+          </div>
         ) : (
           <div
             className={cn(
