@@ -127,7 +127,16 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
       type: "switch",
       fallback: true,
     },
-    { key: "layout", label: "Layout (centro / lado)", type: "text", placeholder: "centro" },
+    {
+      key: "layout",
+      label: "Layout",
+      type: "select",
+      fallback: "centro",
+      options: [
+        { value: "centro", label: "Centralizado" },
+        { value: "lado", label: "Foto ao lado do texto" },
+      ],
+    },
     SPACING_FIELD,
   ],
   wedding_party: [

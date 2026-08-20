@@ -214,27 +214,45 @@ export function WeddingSiteView({
     <Countdown date={wedding.wedding_date} time={wedding.ceremony_time} />
   ) : null;
 
+  const storyLayout = fieldText(storySection, "layout") || "centro";
+
   const storyBlock =
     storyParagraphs.length > 0 || storyImage ? (
       <Section
         title={storySection?.title ?? "Nossa história"}
         spacing={fieldText(storySection, "spacing")}
       >
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-          {storyImage ? (
+        {storyLayout === "lado" && storyImage ? (
+          <div className="mx-auto grid max-w-4xl items-center gap-8 sm:grid-cols-2">
             <img
               src={storyImage}
               alt={`Foto de ${couple.display_name}`}
               loading="lazy"
-              className="aspect-[4/3] w-full max-w-md rounded-xl object-cover"
+              className="aspect-[4/3] w-full rounded-xl object-cover"
             />
-          ) : null}
-          <div className="space-y-4 text-center leading-relaxed">
-            {storyParagraphs.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
+            <div className="space-y-4 leading-relaxed">
+              {storyParagraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
+            {storyImage ? (
+              <img
+                src={storyImage}
+                alt={`Foto de ${couple.display_name}`}
+                loading="lazy"
+                className="aspect-[4/3] w-full max-w-md rounded-xl object-cover"
+              />
+            ) : null}
+            <div className="space-y-4 text-center leading-relaxed">
+              {storyParagraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </div>
+        )}
       </Section>
     ) : (
       <p className="px-4 py-8 text-center text-sm text-muted-foreground">
