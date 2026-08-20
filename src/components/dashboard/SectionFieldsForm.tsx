@@ -259,3 +259,67 @@ export function FieldInput({
     </div>
   );
 }
+
+/** Lista arrastável que define a ordem de blocos dentro de uma seção (ex.: imagem × texto). */
+function OrderField({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldDef;
+  value: unknown;
+  onChange: (value: unknown) => void;
+}) {
+  const all = (field.options ?? []).map((o) => o.value);
+  const saved = Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  const items = [...saved.filter((v) => all.includes(v)), ...all.filter((v) => !saved.includes(v))];
+  const labelOf = (v: string) => field.options?.find((o) => o.value === v)?.label ?? v;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function onDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = items.indexOf(String(active.id));
+    const newIndex = items.indexOf(String(over.id));
+    onChange(arrayMove(items, oldIndex, newIndex));
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>{field.label}</Label>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {items.map((item) => (
+              <OrderRow key={item} id={item} label={labelOf(item)} />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </div>
+  );
+}
+
+function OrderRow({ id, label }: { id: string; label: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ${
+        isDragging ? "opacity-70 ring-2 ring-primary/30" : ""
+      }`}
+      {...attributes}
+      {...listeners}
+    >
+      <GripVertical className="size-4 cursor-grab touch-none text-muted-foreground" />
+      {label}
+    </div>
+  );
+}
