@@ -1,16 +1,41 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ImagePlus, Loader2, Save } from "lucide-react";
+import { GripVertical, ImagePlus, Loader2, Save } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SECTION_FIELDS, sectionSettings, type FieldDef } from "@/lib/sections";
 import { updateSectionSettings } from "@/services/couples";
 import { uploadPhoto } from "@/services/storage";
 import { SECTION_LABELS, type SectionType, type WebsiteSection } from "@/types";
+
 
 /**
  * Formulário com todos os campos editáveis de uma seção (título + campos específicos do tipo).
