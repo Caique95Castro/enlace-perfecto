@@ -166,3 +166,25 @@ export function linesOf(text: string): string[] {
     .map((l) => l.trim())
     .filter(Boolean);
 }
+
+/** Valor de um campo `select`, com fallback quando ainda não foi escolhido. */
+export function fieldChoice(
+  section: Pick<WebsiteSection, "settings"> | null | undefined,
+  key: string,
+  fallback: string,
+): string {
+  const value = sectionSettings(section)[key];
+  return typeof value === "string" && value ? value : fallback;
+}
+
+/** Ordem salva de um campo `order` (lista arrastável), normalizada contra os itens válidos. */
+export function fieldOrder(
+  section: Pick<WebsiteSection, "settings"> | null | undefined,
+  key: string,
+  fallback: string[],
+): string[] {
+  const value = sectionSettings(section)[key];
+  const saved = Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  const valid = saved.filter((v) => fallback.includes(v));
+  return [...valid, ...fallback.filter((v) => !valid.includes(v))];
+}
