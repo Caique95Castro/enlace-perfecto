@@ -139,6 +139,15 @@ export function WeddingSiteView({
     fieldText(storySection, "text") || storySection?.content || wedding?.description || "",
   );
   const storyImage = fieldText(storySection, "image_url");
+  // Compatível com valores antigos digitados à mão ("lado" / "centro").
+  const rawStoryLayout = fieldChoice(storySection, "layout", "stacked").toLowerCase();
+  const storySide = rawStoryLayout === "side" || rawStoryLayout === "lado";
+  const storyOrder = fieldOrder(storySection, "media_order", ["image", "text"]);
+  const storyAlign = fieldChoice(storySection, "align", "center");
+  const storyPhotos = fieldBool(storySection, "show_gallery", true)
+    ? photos.filter((p) => p.category === "story")
+    : [];
+
 
   const wrap = (
     type: SiteBlockType,
