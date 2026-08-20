@@ -195,34 +195,86 @@ export function WeddingSiteView({
     </header>
   );
 
+  const countdownSection = sectionOf("countdown");
   const countdownBlock = wedding?.wedding_date ? (
-    <Countdown date={wedding.wedding_date} time={wedding.ceremony_time} />
+    <Countdown
+      date={wedding.wedding_date}
+      time={wedding.ceremony_time}
+      subtitle={fieldText(countdownSection, "subtitle")}
+      show={{
+        days: fieldBool(countdownSection, "show_days", true),
+        hours: fieldBool(countdownSection, "show_hours", true),
+        minutes: fieldBool(countdownSection, "show_minutes", true),
+        seconds: fieldBool(countdownSection, "show_seconds", true),
+      }}
+    />
   ) : null;
+
+  const storyImageNode = storyImage ? (
+    <img
+      key="image"
+      src={storyImage}
+      alt={`Foto de ${couple.display_name}`}
+      loading="lazy"
+      className={cn(
+        "w-full rounded-xl object-cover",
+        storySide ? "aspect-[4/5]" : "mx-auto aspect-[4/3] max-w-md",
+      )}
+    />
+  ) : null;
+
+  const storyTextNode =
+    storyParagraphs.length > 0 ? (
+      <div
+        key="text"
+        className={cn(
+          "space-y-4 leading-relaxed",
+          storyAlign === "left" ? "text-left" : "text-center",
+        )}
+      >
+        {storyParagraphs.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </div>
+    ) : null;
+
+  const storyNodes = storyOrder
+    .map((item) => (item === "image" ? storyImageNode : storyTextNode))
+    .filter(Boolean);
 
   const storyBlock =
     storyParagraphs.length > 0 || storyImage ? (
       <Section title={storySection?.title ?? "Nossa história"}>
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-          {storyImage ? (
-            <img
-              src={storyImage}
-              alt={`Foto de ${couple.display_name}`}
-              loading="lazy"
-              className="aspect-[4/3] w-full max-w-md rounded-xl object-cover"
-            />
-          ) : null}
-          <div className="space-y-4 text-center leading-relaxed">
-            {storyParagraphs.map((p, i) => (
-              <p key={i}>{p}</p>
+        <div
+          className={cn(
+            "mx-auto gap-8",
+            storySide
+              ? "grid max-w-4xl items-center sm:grid-cols-2"
+              : "flex max-w-2xl flex-col items-center",
+          )}
+        >
+          {storyNodes}
+        </div>
+        {storyPhotos.length > 0 ? (
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {storyPhotos.map((photo) => (
+              <img
+                key={photo.id}
+                src={photo.public_url}
+                alt={photo.caption ?? `Foto de ${couple.display_name}`}
+                loading="lazy"
+                className="aspect-square w-full rounded-lg object-cover"
+              />
             ))}
           </div>
-        </div>
+        ) : null}
       </Section>
     ) : (
       <p className="px-4 py-8 text-center text-sm text-muted-foreground">
         Adicione um texto ou foto para a seção de história.
       </p>
     );
+
 
   const galleryBlock =
     gallery.length > 0 ? (
