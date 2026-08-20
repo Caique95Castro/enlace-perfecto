@@ -17,13 +17,32 @@ import { submitGuestMessage } from "@/services/messages";
 import { createGiftOrder } from "@/services/gifts";
 import { createPayment } from "@/lib/payments.functions";
 import { countdownTo, formatCurrency, formatDateLong, formatTime } from "@/lib/format";
-import { fieldBool, fieldText, paragraphsOf } from "@/lib/sections";
+import {
+  fieldBool,
+  fieldChoice,
+  fieldOrder,
+  fieldText,
+  linesOf,
+  paragraphsOf,
+} from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import type { SectionType, WebsiteSection } from "@/types";
 
 /** Tipos de seção que aparecem como blocos independentes e reordenáveis no site. */
 export type SiteBlockType =
-  "hero" | "countdown" | "story" | "gallery" | "event" | "rsvp" | "gifts" | "message";
+  | "hero"
+  | "countdown"
+  | "story"
+  | "gallery"
+  | "event"
+  | "wedding_party"
+  | "location"
+  | "dress_code"
+  | "info"
+  | "rsvp"
+  | "gifts"
+  | "message";
+
 
 export type WeddingSiteData = {
   couple: {
@@ -120,6 +139,15 @@ export function WeddingSiteView({
     fieldText(storySection, "text") || storySection?.content || wedding?.description || "",
   );
   const storyImage = fieldText(storySection, "image_url");
+  // Compatível com valores antigos digitados à mão ("lado" / "centro").
+  const rawStoryLayout = fieldChoice(storySection, "layout", "stacked").toLowerCase();
+  const storySide = rawStoryLayout === "side" || rawStoryLayout === "lado";
+  const storyOrder = fieldOrder(storySection, "media_order", ["image", "text"]);
+  const storyAlign = fieldChoice(storySection, "align", "center");
+  const storyPhotos = fieldBool(storySection, "show_gallery", true)
+    ? photos.filter((p) => p.category === "story")
+    : [];
+
 
   const wrap = (
     type: SiteBlockType,
@@ -167,34 +195,86 @@ export function WeddingSiteView({
     </header>
   );
 
+  const countdownSection = sectionOf("countdown");
   const countdownBlock = wedding?.wedding_date ? (
-    <Countdown date={wedding.wedding_date} time={wedding.ceremony_time} />
+    <Countdown
+      date={wedding.wedding_date}
+      time={wedding.ceremony_time}
+      subtitle={fieldText(countdownSection, "subtitle")}
+      show={{
+        days: fieldBool(countdownSection, "show_days", true),
+        hours: fieldBool(countdownSection, "show_hours", true),
+        minutes: fieldBool(countdownSection, "show_minutes", true),
+        seconds: fieldBool(countdownSection, "show_seconds", true),
+      }}
+    />
   ) : null;
+
+  const storyImageNode = storyImage ? (
+    <img
+      key="image"
+      src={storyImage}
+      alt={`Foto de ${couple.display_name}`}
+      loading="lazy"
+      className={cn(
+        "w-full rounded-xl object-cover",
+        storySide ? "aspect-[4/5]" : "mx-auto aspect-[4/3] max-w-md",
+      )}
+    />
+  ) : null;
+
+  const storyTextNode =
+    storyParagraphs.length > 0 ? (
+      <div
+        key="text"
+        className={cn(
+          "space-y-4 leading-relaxed",
+          storyAlign === "left" ? "text-left" : "text-center",
+        )}
+      >
+        {storyParagraphs.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </div>
+    ) : null;
+
+  const storyNodes = storyOrder
+    .map((item) => (item === "image" ? storyImageNode : storyTextNode))
+    .filter(Boolean);
 
   const storyBlock =
     storyParagraphs.length > 0 || storyImage ? (
       <Section title={storySection?.title ?? "Nossa história"}>
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-          {storyImage ? (
-            <img
-              src={storyImage}
-              alt={`Foto de ${couple.display_name}`}
-              loading="lazy"
-              className="aspect-[4/3] w-full max-w-md rounded-xl object-cover"
-            />
-          ) : null}
-          <div className="space-y-4 text-center leading-relaxed">
-            {storyParagraphs.map((p, i) => (
-              <p key={i}>{p}</p>
+        <div
+          className={cn(
+            "mx-auto gap-8",
+            storySide
+              ? "grid max-w-4xl items-center sm:grid-cols-2"
+              : "flex max-w-2xl flex-col items-center",
+          )}
+        >
+          {storyNodes}
+        </div>
+        {storyPhotos.length > 0 ? (
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {storyPhotos.map((photo) => (
+              <img
+                key={photo.id}
+                src={photo.public_url}
+                alt={photo.caption ?? `Foto de ${couple.display_name}`}
+                loading="lazy"
+                className="aspect-square w-full rounded-lg object-cover"
+              />
             ))}
           </div>
-        </div>
+        ) : null}
       </Section>
     ) : (
       <p className="px-4 py-8 text-center text-sm text-muted-foreground">
         Adicione um texto ou foto para a seção de história.
       </p>
     );
+
 
   const galleryBlock =
     gallery.length > 0 ? (
@@ -217,43 +297,128 @@ export function WeddingSiteView({
       </p>
     );
 
+  const eventSection = sectionOf("event");
+  const eventVenue = fieldText(eventSection, "venue_name") || wedding?.venue_name || "Local a definir";
+  const eventAddress =
+    fieldText(eventSection, "address") ||
+    [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ");
+  const eventTime = fieldText(eventSection, "time") || formatTime(wedding?.ceremony_time ?? null);
+  const eventMap = fieldText(eventSection, "map_url");
+
   const eventBlock = (
-    <Section title={sectionOf("event")?.title ?? "Cerimônia"}>
+    <Section id="cerimonia" title={eventSection?.title ?? "Cerimônia"}>
+      <SectionText text={fieldText(eventSection, "description")} />
       <div className="mx-auto grid max-w-2xl gap-6 text-center sm:grid-cols-2">
         <div>
           <CalendarHeart className="mx-auto size-6" style={{ color: settings.primary_color }} />
           <p className="mt-3 font-medium">{formatDateLong(wedding?.wedding_date)}</p>
-          {wedding?.ceremony_time ? <p>{formatTime(wedding.ceremony_time)}</p> : null}
+          {eventTime ? <p>{eventTime}</p> : null}
         </div>
         <div>
           <MapPin className="mx-auto size-6" style={{ color: settings.primary_color }} />
-          <p className="mt-3 font-medium">{wedding?.venue_name ?? "Local a definir"}</p>
-          <p className="text-sm">
-            {[wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ")}
+          <p className="mt-3 font-medium">{eventVenue}</p>
+          {eventAddress ? <p className="text-sm">{eventAddress}</p> : null}
+          {eventMap ? (
+            <a
+              href={eventMap}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-block text-sm underline"
+            >
+              Ver no mapa
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </Section>
+  );
+
+  const partySection = sectionOf("wedding_party");
+  const partyBlock = (
+    <Section id="padrinhos" title={partySection?.title ?? "Padrinhos e madrinhas"}>
+      <SectionText text={fieldText(partySection, "description")} />
+      <div className="mx-auto grid max-w-2xl gap-6 text-center sm:grid-cols-2">
+        <div>
+          <p className="font-display text-xl">
+            {fieldText(partySection, "groom_side_label") || "Padrinhos"}
+          </p>
+        </div>
+        <div>
+          <p className="font-display text-xl">
+            {fieldText(partySection, "bride_side_label") || "Madrinhas"}
           </p>
         </div>
       </div>
-      {visible.has("dress_code") && wedding?.dress_code ? (
-        <p className="mt-8 text-center text-sm uppercase tracking-widest">
-          Dress code: {wedding.dress_code}
+    </Section>
+  );
+
+  const locationSection = sectionOf("location");
+  const locationMap = fieldText(locationSection, "map_url");
+  const locationBlock = (
+    <Section id="local" title={locationSection?.title ?? "Local"} tinted primary={settings.secondary_color}>
+      <div className="text-center">
+        <p className="font-medium">
+          {fieldText(locationSection, "venue_name") || wedding?.venue_name || "Local a definir"}
         </p>
+        <p className="mt-1 text-sm">
+          {fieldText(locationSection, "address") ||
+            [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ")}
+        </p>
+        {locationMap ? (
+          <a
+            href={locationMap}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-block text-sm underline"
+          >
+            Como chegar
+          </a>
+        ) : null}
+      </div>
+    </Section>
+  );
+
+  const dressSection = sectionOf("dress_code");
+  const dressBlock = (
+    <Section id="dresscode" title={dressSection?.title ?? "Dress code"}>
+      <SectionText
+        text={fieldText(dressSection, "description") || wedding?.dress_code || ""}
+      />
+      <SectionText text={fieldText(dressSection, "guidelines")} />
+    </Section>
+  );
+
+  const infoSection = sectionOf("info");
+  const infoNotes = linesOf(fieldText(infoSection, "notes"));
+  const infoBlock = (
+    <Section id="informacoes" title={infoSection?.title ?? "Informações importantes"}>
+      <SectionText text={fieldText(infoSection, "description")} />
+      {infoNotes.length > 0 ? (
+        <ul className="mx-auto max-w-2xl list-disc space-y-2 pl-6 text-left">
+          {infoNotes.map((note, i) => (
+            <li key={i}>{note}</li>
+          ))}
+        </ul>
       ) : null}
     </Section>
   );
 
   const rsvpBlock = (
     <Section
+      id="rsvp"
       title={sectionOf("rsvp")?.title ?? "Confirme sua presença"}
       tinted
       primary={settings.secondary_color}
     >
+      <SectionText text={fieldText(sectionOf("rsvp"), "description")} />
       <RsvpForm slug={couple.slug} interactive={interactive} />
     </Section>
   );
 
   const giftsBlock =
     gifts.length > 0 ? (
-      <Section title={sectionOf("gifts")?.title ?? "Lista de presentes"}>
+      <Section id="presentes" title={sectionOf("gifts")?.title ?? "Lista de presentes"}>
+        <SectionText text={fieldText(sectionOf("gifts"), "description")} />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {gifts.map((gift) => (
             <GiftCard
@@ -273,36 +438,89 @@ export function WeddingSiteView({
 
   const messageBlock = (
     <Section
+      id="recados"
       title={sectionOf("message")?.title ?? "Mural de mensagens"}
       tinted
       primary={settings.secondary_color}
     >
+      <SectionText text={fieldText(sectionOf("message"), "description")} />
       <MessageBoard slug={couple.slug} messages={messages} interactive={interactive} />
     </Section>
   );
+
+  const footerSection = sectionOf("footer");
+  const footerText =
+    fieldText(footerSection, "text") || footerSection?.content || "Esperamos você!";
+  const instagram = fieldText(footerSection, "instagram");
+  const whatsapp = fieldText(footerSection, "whatsapp");
+
+  const blocks: { type: SiteBlockType; node: ReactNode }[] = [
+    { type: "hero", node: heroBlock },
+    { type: "countdown", node: countdownBlock },
+    { type: "story", node: storyBlock },
+    { type: "gallery", node: galleryBlock },
+    { type: "event", node: eventBlock },
+    { type: "wedding_party", node: partyBlock },
+    { type: "location", node: locationBlock },
+    { type: "dress_code", node: dressBlock },
+    { type: "info", node: infoBlock },
+    { type: "rsvp", node: rsvpBlock },
+    { type: "gifts", node: giftsBlock },
+    { type: "message", node: messageBlock },
+  ];
+
+  // A ordem dos blocos segue a posição salva em website_sections (arrastar no editor).
+  const orderOf = (type: SiteBlockType) =>
+    sections.find((s) => s.section_type === type)?.position ?? 999;
+  const ordered = [...blocks].sort((a, b) => orderOf(a.type) - orderOf(b.type));
 
   return (
     <div style={style} className="min-h-screen text-neutral-800">
       {visible.has("header") ? <SiteHeader section={headerSection} couple={couple} /> : null}
 
-      {visible.has("hero") ? wrap("hero", heroSection, heroBlock) : null}
-      {visible.has("countdown") ? wrap("countdown", sectionOf("countdown"), countdownBlock) : null}
-      {visible.has("story") ? wrap("story", storySection, storyBlock) : null}
-      {visible.has("gallery") ? wrap("gallery", sectionOf("gallery"), galleryBlock) : null}
-      {visible.has("event") || visible.has("location")
-        ? wrap("event", sectionOf("event"), eventBlock)
-        : null}
-      {visible.has("rsvp") ? wrap("rsvp", sectionOf("rsvp"), rsvpBlock) : null}
-      {visible.has("gifts") ? wrap("gifts", sectionOf("gifts"), giftsBlock) : null}
-      {visible.has("message") ? wrap("message", sectionOf("message"), messageBlock) : null}
+      {ordered.map(({ type, node }) =>
+        visible.has(type) && node ? (
+          <div key={type}>{wrap(type, sectionOf(type), node)}</div>
+        ) : null,
+      )}
 
-      <footer className="px-4 py-12 text-center text-sm">
-        <p className="font-display text-2xl">{couple.display_name}</p>
-        <p className="mt-2 opacity-70">{sectionOf("footer")?.content ?? "Esperamos você!"}</p>
-      </footer>
+      {visible.has("footer") ? (
+        <footer className="px-4 py-12 text-center text-sm">
+          <p className="font-display text-2xl">{couple.display_name}</p>
+          <p className="mt-2 opacity-70">{footerText}</p>
+          {instagram || whatsapp ? (
+            <div className="mt-3 flex justify-center gap-4">
+              {instagram ? (
+                <a href={instagram} target="_blank" rel="noreferrer" className="underline">
+                  Instagram
+                </a>
+              ) : null}
+              {whatsapp ? (
+                <a href={whatsapp} target="_blank" rel="noreferrer" className="underline">
+                  WhatsApp
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+        </footer>
+      ) : null}
     </div>
   );
 }
+
+/** Texto descritivo opcional exibido no topo de uma seção. */
+function SectionText({ text }: { text: string }) {
+  const paragraphs = paragraphsOf(text);
+  if (paragraphs.length === 0) return null;
+  return (
+    <div className="mx-auto mb-8 max-w-2xl space-y-3 text-center leading-relaxed">
+      {paragraphs.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+    </div>
+  );
+}
+
 
 function SiteHeader({
   section,

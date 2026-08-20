@@ -1,15 +1,20 @@
 import type { WebsiteSection, SectionType } from "@/types";
 
-export type FieldType = "text" | "textarea" | "switch" | "image" | "url";
+export type FieldType = "text" | "textarea" | "switch" | "image" | "url" | "select" | "order";
+
+export type FieldOption = { value: string; label: string };
 
 export type FieldDef = {
   key: string;
   label: string;
   type: FieldType;
   placeholder?: string;
+  /** Opções para campos do tipo `select`, ou itens arrastáveis para `order`. */
+  options?: FieldOption[];
   /** Valor padrão quando o campo nunca foi preenchido. */
-  fallback?: string | boolean;
+  fallback?: string | boolean | string[];
 };
+
 
 /**
  * Campos próprios de cada seção. Os valores ficam em website_sections.settings (jsonb),
@@ -50,7 +55,37 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "text", label: "Nossa história (use linhas em branco para separar parágrafos)", type: "textarea" },
     { key: "image_url", label: "Imagem", type: "image" },
     { key: "show_gallery", label: "Mostrar fotos da categoria história", type: "switch", fallback: true },
-    { key: "layout", label: "Layout (centro / lado)", type: "text", placeholder: "centro" },
+    {
+      key: "layout",
+      label: "Disposição da imagem e do texto",
+      type: "select",
+      fallback: "stacked",
+      options: [
+        { value: "stacked", label: "Empilhado (imagem em cima, texto embaixo)" },
+        { value: "side", label: "Lado a lado (imagem e texto na mesma linha)" },
+      ],
+    },
+    {
+      key: "media_order",
+      label: "Arraste para definir a ordem",
+      type: "order",
+      fallback: ["image", "text"],
+      options: [
+        { value: "image", label: "Imagem" },
+        { value: "text", label: "Texto" },
+      ],
+    },
+    {
+      key: "align",
+      label: "Alinhamento do texto",
+      type: "select",
+      fallback: "center",
+      options: [
+        { value: "center", label: "Centralizado" },
+        { value: "left", label: "À esquerda" },
+      ],
+    },
+
   ],
   wedding_party: [
     { key: "description", label: "Descrição", type: "textarea" },
@@ -130,4 +165,26 @@ export function linesOf(text: string): string[] {
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
+}
+
+/** Valor de um campo `select`, com fallback quando ainda não foi escolhido. */
+export function fieldChoice(
+  section: Pick<WebsiteSection, "settings"> | null | undefined,
+  key: string,
+  fallback: string,
+): string {
+  const value = sectionSettings(section)[key];
+  return typeof value === "string" && value ? value : fallback;
+}
+
+/** Ordem salva de um campo `order` (lista arrastável), normalizada contra os itens válidos. */
+export function fieldOrder(
+  section: Pick<WebsiteSection, "settings"> | null | undefined,
+  key: string,
+  fallback: string[],
+): string[] {
+  const value = sectionSettings(section)[key];
+  const saved = Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  const valid = saved.filter((v) => fallback.includes(v));
+  return [...valid, ...fallback.filter((v) => !valid.includes(v))];
 }
