@@ -43,7 +43,6 @@ export type SiteBlockType =
   | "gifts"
   | "message";
 
-
 export type WeddingSiteData = {
   couple: {
     id?: string;
@@ -147,7 +146,6 @@ export function WeddingSiteView({
   const storyPhotos = fieldBool(storySection, "show_gallery", true)
     ? photos.filter((p) => p.category === "story")
     : [];
-
 
   const wrap = (
     type: SiteBlockType,
@@ -275,7 +273,6 @@ export function WeddingSiteView({
       </p>
     );
 
-
   const galleryBlock =
     gallery.length > 0 ? (
       <Section title={sectionOf("gallery")?.title ?? "Galeria"}>
@@ -298,7 +295,8 @@ export function WeddingSiteView({
     );
 
   const eventSection = sectionOf("event");
-  const eventVenue = fieldText(eventSection, "venue_name") || wedding?.venue_name || "Local a definir";
+  const eventVenue =
+    fieldText(eventSection, "venue_name") || wedding?.venue_name || "Local a definir";
   const eventAddress =
     fieldText(eventSection, "address") ||
     [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ");
@@ -355,7 +353,12 @@ export function WeddingSiteView({
   const locationSection = sectionOf("location");
   const locationMap = fieldText(locationSection, "map_url");
   const locationBlock = (
-    <Section id="local" title={locationSection?.title ?? "Local"} tinted primary={settings.secondary_color}>
+    <Section
+      id="local"
+      title={locationSection?.title ?? "Local"}
+      tinted
+      primary={settings.secondary_color}
+    >
       <div className="text-center">
         <p className="font-medium">
           {fieldText(locationSection, "venue_name") || wedding?.venue_name || "Local a definir"}
@@ -381,9 +384,7 @@ export function WeddingSiteView({
   const dressSection = sectionOf("dress_code");
   const dressBlock = (
     <Section id="dresscode" title={dressSection?.title ?? "Dress code"}>
-      <SectionText
-        text={fieldText(dressSection, "description") || wedding?.dress_code || ""}
-      />
+      <SectionText text={fieldText(dressSection, "description") || wedding?.dress_code || ""} />
       <SectionText text={fieldText(dressSection, "guidelines")} />
     </Section>
   );
@@ -521,7 +522,6 @@ function SectionText({ text }: { text: string }) {
   );
 }
 
-
 function SiteHeader({
   section,
   couple,
@@ -580,11 +580,13 @@ function SiteHeader({
 }
 
 function Section({
+  id,
   title,
   children,
   tinted,
   primary,
 }: {
+  id?: string;
   title: string;
   children: ReactNode;
   tinted?: boolean;
@@ -592,6 +594,7 @@ function Section({
 }) {
   return (
     <section
+      id={id}
       className="px-4 py-16 sm:py-20"
       style={tinted && primary ? { backgroundColor: `${primary}33` } : undefined}
     >
@@ -605,29 +608,53 @@ function Section({
   );
 }
 
-function Countdown({ date, time }: { date: string; time: string | null }) {
+function Countdown({
+  date,
+  time,
+  subtitle,
+  show,
+}: {
+  date: string;
+  time: string | null;
+  subtitle?: string;
+  show?: { days: boolean; hours: boolean; minutes: boolean; seconds: boolean };
+}) {
   const [cd, setCd] = useState(() => countdownTo(date, time));
   useEffect(() => {
     const id = setInterval(() => setCd(countdownTo(date, time)), 1000);
     return () => clearInterval(id);
   }, [date, time]);
 
-  const items = [
-    ["Dias", cd.days],
-    ["Horas", cd.hours],
-    ["Min", cd.minutes],
-    ["Seg", cd.seconds],
-  ] as const;
+  const visibility = {
+    days: show?.days ?? true,
+    hours: show?.hours ?? true,
+    minutes: show?.minutes ?? true,
+    seconds: show?.seconds ?? true,
+  };
+
+  const items = (
+    [
+      ["Dias", cd.days, visibility.days],
+      ["Horas", cd.hours, visibility.hours],
+      ["Min", cd.minutes, visibility.minutes],
+      ["Seg", cd.seconds, visibility.seconds],
+    ] as const
+  ).filter(([, , visible]) => visible);
 
   return (
     <section className="px-4 py-12">
-      <div className="mx-auto flex max-w-2xl justify-center gap-6 sm:gap-12">
-        {items.map(([label, value]) => (
-          <div key={label} className="text-center">
-            <p className="font-display text-4xl font-semibold sm:text-5xl">{value}</p>
-            <p className="text-xs uppercase tracking-widest opacity-70">{label}</p>
-          </div>
-        ))}
+      <div className="mx-auto max-w-2xl text-center">
+        {subtitle ? (
+          <p className="mb-4 text-sm uppercase tracking-widest opacity-70">{subtitle}</p>
+        ) : null}
+        <div className="flex justify-center gap-6 sm:gap-12">
+          {items.map(([label, value]) => (
+            <div key={label} className="text-center">
+              <p className="font-display text-4xl font-semibold sm:text-5xl">{value}</p>
+              <p className="text-xs uppercase tracking-widest opacity-70">{label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

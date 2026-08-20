@@ -147,14 +147,7 @@ export function VisualSiteEditor({ coupleId, data }: { coupleId: string; data: W
 
 /** Header e footer ficam fixos no layout — as demais seções visíveis podem ser arrastadas. */
 function isDraggableType(type: SectionType): type is SiteBlockType {
-  return (
-    type !== "header" &&
-    type !== "footer" &&
-    type !== "wedding_party" &&
-    type !== "dress_code" &&
-    type !== "location" &&
-    type !== "info"
-  );
+  return type !== "header" && type !== "footer";
 }
 
 function draggableSections(sections: WebsiteSection[]): WebsiteSection[] {
