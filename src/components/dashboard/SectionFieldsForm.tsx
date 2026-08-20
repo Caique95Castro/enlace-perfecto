@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SECTION_FIELDS, sectionSettings, type FieldDef } from "@/lib/sections";
 import { updateSectionSettings } from "@/services/couples";
 import { uploadPhoto } from "@/services/storage";
@@ -116,6 +123,27 @@ export function FieldInput({
       <div className="flex items-center justify-between gap-4">
         <Label htmlFor={id}>{field.label}</Label>
         <Switch id={id} checked={checked} onCheckedChange={onChange} />
+      </div>
+    );
+  }
+
+  if (field.type === "select") {
+    const current = text || (typeof field.fallback === "string" ? field.fallback : "");
+    return (
+      <div className="space-y-2">
+        <Label htmlFor={id}>{field.label}</Label>
+        <Select value={current} onValueChange={onChange}>
+          <SelectTrigger id={id}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(field.options ?? []).map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     );
   }

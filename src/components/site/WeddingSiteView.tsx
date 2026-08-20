@@ -115,6 +115,14 @@ export function WeddingSiteView({
   const heroCtaLink = fieldText(heroSection, "cta_link") || "#rsvp";
   const heroCtaSecondaryLabel = fieldText(heroSection, "cta_secondary_label");
   const heroCtaSecondaryLink = fieldText(heroSection, "cta_secondary_link") || "#presentes";
+  const heroHeight = fieldText(heroSection, "height") || "padrao";
+  const heroHeightClass =
+    {
+      compacto: "min-h-[42vh]",
+      padrao: "min-h-[70vh]",
+      grande: "min-h-[88vh]",
+      tela_cheia: "min-h-screen",
+    }[heroHeight] ?? "min-h-[70vh]";
 
   const storyParagraphs = paragraphsOf(
     fieldText(storySection, "text") || storySection?.content || wedding?.description || "",
@@ -128,7 +136,12 @@ export function WeddingSiteView({
   ) => (renderBlock ? renderBlock(type, section, node) : node);
 
   const heroBlock = (
-    <header className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-4 text-center">
+    <header
+      className={cn(
+        "relative flex items-center justify-center overflow-hidden px-4 text-center",
+        heroHeightClass,
+      )}
+    >
       {heroImage ? (
         <>
           <img
