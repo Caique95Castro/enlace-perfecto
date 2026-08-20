@@ -13,6 +13,19 @@ export type FieldDef = {
   options?: { value: string; label: string }[];
 };
 
+/** Campo de espaçamento vertical, reaproveitado pelas seções de conteúdo (story, gallery, event, rsvp, gifts, message). */
+const SPACING_FIELD: FieldDef = {
+  key: "spacing",
+  label: "Espaçamento da seção",
+  type: "select",
+  fallback: "padrao",
+  options: [
+    { value: "compacto", label: "Compacto" },
+    { value: "padrao", label: "Padrão" },
+    { value: "espacoso", label: "Espaçoso" },
+  ],
+};
+
 /**
  * Campos próprios de cada seção. Os valores ficam em website_sections.settings (jsonb),
  * então o conteúdo do site público sempre vem do banco — nunca de texto fixo no código.
@@ -55,6 +68,28 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
         { value: "tela_cheia", label: "Tela cheia" },
       ],
     },
+    {
+      key: "align",
+      label: "Alinhamento do texto",
+      type: "select",
+      fallback: "centro",
+      options: [
+        { value: "esquerda", label: "Esquerda" },
+        { value: "centro", label: "Centro" },
+        { value: "direita", label: "Direita" },
+      ],
+    },
+    {
+      key: "title_size",
+      label: "Tamanho do título",
+      type: "select",
+      fallback: "grande",
+      options: [
+        { value: "medio", label: "Médio" },
+        { value: "grande", label: "Grande" },
+        { value: "extra_grande", label: "Extra grande" },
+      ],
+    },
     { key: "overlay", label: "Escurecer imagem de fundo", type: "switch", fallback: true },
     { key: "cta_enabled", label: "Mostrar botão", type: "switch", fallback: true },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
@@ -93,6 +128,7 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
       fallback: true,
     },
     { key: "layout", label: "Layout (centro / lado)", type: "text", placeholder: "centro" },
+    SPACING_FIELD,
   ],
   wedding_party: [
     { key: "description", label: "Descrição", type: "textarea" },
@@ -119,6 +155,7 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "time", label: "Horário", type: "text" },
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "map_url", label: "Link do mapa", type: "url" },
+    SPACING_FIELD,
   ],
   location: [
     { key: "venue_name", label: "Nome do local", type: "text" },
@@ -129,13 +166,14 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "guidelines", label: "Orientações", type: "textarea" },
   ],
-  gallery: [{ key: "description", label: "Descrição", type: "textarea" }],
+  gallery: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
   rsvp: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
+    SPACING_FIELD,
   ],
-  gifts: [{ key: "description", label: "Descrição", type: "textarea" }],
-  message: [{ key: "description", label: "Descrição", type: "textarea" }],
+  gifts: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
+  message: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
   footer: [
     { key: "text", label: "Texto do rodapé", type: "textarea" },
     { key: "instagram", label: "Instagram", type: "url" },

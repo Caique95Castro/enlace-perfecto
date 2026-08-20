@@ -123,6 +123,20 @@ export function WeddingSiteView({
       grande: "min-h-[88vh]",
       tela_cheia: "min-h-screen",
     }[heroHeight] ?? "min-h-[70vh]";
+  const heroAlign = fieldText(heroSection, "align") || "centro";
+  const heroAlignClass =
+    {
+      esquerda: "items-start text-left",
+      centro: "items-center text-center",
+      direita: "items-end text-right",
+    }[heroAlign] ?? "items-center text-center";
+  const heroTitleSize = fieldText(heroSection, "title_size") || "grande";
+  const heroTitleClass =
+    {
+      medio: "text-3xl sm:text-4xl",
+      grande: "text-5xl sm:text-6xl",
+      extra_grande: "text-6xl sm:text-7xl",
+    }[heroTitleSize] ?? "text-5xl sm:text-6xl";
 
   const storyParagraphs = paragraphsOf(
     fieldText(storySection, "text") || storySection?.content || wedding?.description || "",
@@ -138,8 +152,9 @@ export function WeddingSiteView({
   const heroBlock = (
     <header
       className={cn(
-        "relative flex items-center justify-center overflow-hidden px-4 text-center",
+        "relative flex flex-col overflow-hidden px-4 justify-center",
         heroHeightClass,
+        heroAlignClass,
       )}
     >
       {heroImage ? (
@@ -152,15 +167,30 @@ export function WeddingSiteView({
           {heroOverlay ? <div className="absolute inset-0 bg-black/35" /> : null}
         </>
       ) : null}
-      <div className={heroImage ? "relative text-white" : "relative"}>
+      <div
+        className={cn(
+          "relative flex w-full flex-col",
+          heroAlignClass,
+          heroImage ? "text-white" : "",
+        )}
+      >
         <p className="text-xs uppercase tracking-[0.35em]">{heroEyebrow}</p>
-        <h1 className="mt-4 font-display text-5xl font-semibold sm:text-6xl">
+        <h1 className={cn("mt-4 font-display font-semibold", heroTitleClass)}>
           {heroHeadline || `${couple.partner_1_name} & ${couple.partner_2_name}`}
         </h1>
         {heroSubheadline ? <p className="mt-3 text-base opacity-90">{heroSubheadline}</p> : null}
         <p className="mt-4 text-lg">{heroDateText}</p>
         {heroCtaEnabled ? (
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+          <div
+            className={cn(
+              "mt-7 flex flex-wrap items-center gap-3",
+              heroAlign === "esquerda"
+                ? "justify-start"
+                : heroAlign === "direita"
+                  ? "justify-end"
+                  : "justify-center",
+            )}
+          >
             <a href={heroCtaLink}>
               <Button>{heroCtaLabel}</Button>
             </a>
@@ -186,7 +216,10 @@ export function WeddingSiteView({
 
   const storyBlock =
     storyParagraphs.length > 0 || storyImage ? (
-      <Section title={storySection?.title ?? "Nossa história"}>
+      <Section
+        title={storySection?.title ?? "Nossa história"}
+        spacing={fieldText(storySection, "spacing")}
+      >
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
           {storyImage ? (
             <img
@@ -211,7 +244,10 @@ export function WeddingSiteView({
 
   const galleryBlock =
     gallery.length > 0 ? (
-      <Section title={sectionOf("gallery")?.title ?? "Galeria"}>
+      <Section
+        title={sectionOf("gallery")?.title ?? "Galeria"}
+        spacing={fieldText(sectionOf("gallery"), "spacing")}
+      >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {gallery.map((photo) => (
             <img
@@ -231,7 +267,10 @@ export function WeddingSiteView({
     );
 
   const eventBlock = (
-    <Section title={sectionOf("event")?.title ?? "Cerimônia"}>
+    <Section
+      title={sectionOf("event")?.title ?? "Cerimônia"}
+      spacing={fieldText(sectionOf("event"), "spacing")}
+    >
       <div className="mx-auto grid max-w-2xl gap-6 text-center sm:grid-cols-2">
         <div>
           <CalendarHeart className="mx-auto size-6" style={{ color: settings.primary_color }} />
@@ -259,6 +298,7 @@ export function WeddingSiteView({
       title={sectionOf("rsvp")?.title ?? "Confirme sua presença"}
       tinted
       primary={settings.secondary_color}
+      spacing={fieldText(sectionOf("rsvp"), "spacing")}
     >
       <RsvpForm slug={couple.slug} interactive={interactive} />
     </Section>
@@ -266,7 +306,10 @@ export function WeddingSiteView({
 
   const giftsBlock =
     gifts.length > 0 ? (
-      <Section title={sectionOf("gifts")?.title ?? "Lista de presentes"}>
+      <Section
+        title={sectionOf("gifts")?.title ?? "Lista de presentes"}
+        spacing={fieldText(sectionOf("gifts"), "spacing")}
+      >
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {gifts.map((gift) => (
             <GiftCard
@@ -289,6 +332,7 @@ export function WeddingSiteView({
       title={sectionOf("message")?.title ?? "Mural de mensagens"}
       tinted
       primary={settings.secondary_color}
+      spacing={fieldText(sectionOf("message"), "spacing")}
     >
       <MessageBoard slug={couple.slug} messages={messages} interactive={interactive} />
     </Section>
@@ -379,15 +423,20 @@ function Section({
   children,
   tinted,
   primary,
+  spacing = "padrao",
 }: {
   title: string;
   children: ReactNode;
   tinted?: boolean;
   primary?: string;
+  spacing?: string;
 }) {
+  const spacingClass =
+    { compacto: "py-8 sm:py-10", padrao: "py-16 sm:py-20", espacoso: "py-24 sm:py-32" }[spacing] ??
+    "py-16 sm:py-20";
   return (
     <section
-      className="px-4 py-16 sm:py-20"
+      className={cn("px-4", spacingClass)}
       style={tinted && primary ? { backgroundColor: `${primary}33` } : undefined}
     >
       <div className="mx-auto max-w-4xl">
