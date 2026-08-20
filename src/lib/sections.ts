@@ -1,6 +1,7 @@
 import type { WebsiteSection, SectionType } from "@/types";
 
-export type FieldType = "text" | "textarea" | "switch" | "image" | "url" | "select" | "order";
+export type FieldType =
+  "text" | "textarea" | "switch" | "image" | "url" | "select" | "order" | "color" | "heading";
 
 export type FieldOption = { value: string; label: string };
 
@@ -15,6 +16,34 @@ export type FieldDef = {
   fallback?: string | boolean | string[];
 };
 
+/** Ícones disponíveis para os campos do tipo Dress Code (nomes de lucide-react). */
+export const DRESS_CODE_ICON_OPTIONS: FieldOption[] = [
+  { value: "Shirt", label: "Camisa" },
+  { value: "Gem", label: "Joia" },
+  { value: "Sparkles", label: "Brilho" },
+  { value: "Watch", label: "Relógio" },
+  { value: "Star", label: "Estrela" },
+  { value: "AlertTriangle", label: "Alerta" },
+  { value: "Info", label: "Informação" },
+  { value: "Heart", label: "Coração" },
+];
+
+function iconField(key: string, label: string, fallback: string): FieldDef {
+  return { key, label, type: "select", fallback, options: DRESS_CODE_ICON_OPTIONS };
+}
+
+/** Campo de espaçamento vertical, reaproveitado pelas seções de conteúdo. */
+const SPACING_FIELD: FieldDef = {
+  key: "spacing",
+  label: "Espaçamento da seção",
+  type: "select",
+  fallback: "padrao",
+  options: [
+    { value: "compacto", label: "Compacto" },
+    { value: "padrao", label: "Padrão" },
+    { value: "espacoso", label: "Espaçoso" },
+  ],
+};
 
 /**
  * Campos próprios de cada seção. Os valores ficam em website_sections.settings (jsonb),
@@ -25,7 +54,12 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "brand", label: "Nome exibido no topo", type: "text", placeholder: "Ana & João" },
     { key: "logo_url", label: "Logo (opcional)", type: "image" },
     { key: "sticky", label: "Menu fixo ao rolar", type: "switch", fallback: true },
-    { key: "transparent", label: "Fundo transparente sobre a capa", type: "switch", fallback: true },
+    {
+      key: "transparent",
+      label: "Fundo transparente sobre a capa",
+      type: "switch",
+      fallback: true,
+    },
     { key: "text_color", label: "Cor do texto do menu", type: "text", placeholder: "#ffffff" },
     { key: "show_nav", label: "Mostrar links de navegação", type: "switch", fallback: true },
     { key: "cta_label", label: "Botão do topo", type: "text", placeholder: "Confirmar presença" },
@@ -35,14 +69,62 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "eyebrow", label: "Chamada curta", type: "text", placeholder: "Vamos nos casar" },
     { key: "headline", label: "Título", type: "text", placeholder: "Nomes do casal" },
     { key: "subheadline", label: "Subtítulo", type: "text" },
-    { key: "date_text", label: "Data exibida (deixe vazio para usar a data do casamento)", type: "text" },
+    {
+      key: "date_text",
+      label: "Data exibida (deixe vazio para usar a data do casamento)",
+      type: "text",
+    },
     { key: "image_url", label: "Imagem de fundo", type: "image" },
     { key: "overlay", label: "Escurecer imagem de fundo", type: "switch", fallback: true },
     { key: "cta_enabled", label: "Mostrar botão", type: "switch", fallback: true },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
     { key: "cta_link", label: "Link do botão", type: "url", placeholder: "#rsvp" },
-    { key: "cta_secondary_label", label: "Texto do 2º botão", type: "text", placeholder: "Ver presentes" },
-    { key: "cta_secondary_link", label: "Link do 2º botão", type: "url", placeholder: "#presentes" },
+    {
+      key: "cta_secondary_label",
+      label: "Texto do 2º botão",
+      type: "text",
+      placeholder: "Ver presentes",
+    },
+    {
+      key: "cta_secondary_link",
+      label: "Link do 2º botão",
+      type: "url",
+      placeholder: "#presentes",
+    },
+    {
+      key: "height",
+      label: "Altura do banner",
+      type: "select",
+      fallback: "padrao",
+      options: [
+        { value: "compacto", label: "Compacto" },
+        { value: "padrao", label: "Padrão" },
+        { value: "grande", label: "Grande" },
+        { value: "tela_cheia", label: "Tela cheia" },
+      ],
+    },
+    {
+      key: "content_align",
+      label: "Alinhamento do texto",
+      type: "select",
+      fallback: "centro",
+      options: [
+        { value: "esquerda", label: "Esquerda" },
+        { value: "centro", label: "Centro" },
+        { value: "direita", label: "Direita" },
+      ],
+    },
+    {
+      key: "title_size",
+      label: "Tamanho do título",
+      type: "select",
+      fallback: "grande",
+      options: [
+        { value: "medio", label: "Médio" },
+        { value: "grande", label: "Grande" },
+        { value: "extra_grande", label: "Extra grande" },
+      ],
+    },
   ],
   countdown: [
     { key: "subtitle", label: "Subtítulo", type: "text" },
@@ -52,9 +134,18 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "show_seconds", label: "Mostrar segundos", type: "switch", fallback: true },
   ],
   story: [
-    { key: "text", label: "Nossa história (use linhas em branco para separar parágrafos)", type: "textarea" },
+    {
+      key: "text",
+      label: "Nossa história (use linhas em branco para separar parágrafos)",
+      type: "textarea",
+    },
     { key: "image_url", label: "Imagem", type: "image" },
-    { key: "show_gallery", label: "Mostrar fotos da categoria história", type: "switch", fallback: true },
+    {
+      key: "show_gallery",
+      label: "Mostrar fotos da categoria história",
+      type: "switch",
+      fallback: true,
+    },
     {
       key: "layout",
       label: "Disposição da imagem e do texto",
@@ -85,16 +176,28 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
         { value: "left", label: "À esquerda" },
       ],
     },
-
+    SPACING_FIELD,
   ],
   wedding_party: [
     { key: "description", label: "Descrição", type: "textarea" },
-    { key: "groom_side_label", label: "Título do lado do noivo", type: "text", placeholder: "Padrinhos" },
-    { key: "bride_side_label", label: "Título do lado da noiva", type: "text", placeholder: "Madrinhas" },
+    {
+      key: "groom_side_label",
+      label: "Título do lado do noivo",
+      type: "text",
+      placeholder: "Padrinhos",
+    },
+    {
+      key: "bride_side_label",
+      label: "Título do lado da noiva",
+      type: "text",
+      placeholder: "Madrinhas",
+    },
+    SPACING_FIELD,
   ],
   info: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "notes", label: "Informações importantes (uma por linha)", type: "textarea" },
+    SPACING_FIELD,
   ],
   event: [
     { key: "venue_name", label: "Local da cerimônia", type: "text" },
@@ -102,23 +205,165 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "time", label: "Horário", type: "text" },
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "map_url", label: "Link do mapa", type: "url" },
+    SPACING_FIELD,
   ],
   location: [
     { key: "venue_name", label: "Nome do local", type: "text" },
     { key: "address", label: "Endereço", type: "text" },
     { key: "map_url", label: "Link do mapa", type: "url" },
+    SPACING_FIELD,
   ],
   dress_code: [
-    { key: "description", label: "Descrição", type: "textarea" },
-    { key: "guidelines", label: "Orientações", type: "textarea" },
+    { key: "_h_content", label: "Conteúdo", type: "heading" },
+    {
+      key: "description",
+      label: "Subtítulo / descrição",
+      type: "textarea",
+      placeholder: "Queremos que você se sinta confortável e elegante para celebrar conosco.",
+    },
+    {
+      key: "dress_type",
+      label: "Tipo de traje",
+      type: "select",
+      fallback: "social",
+      options: [
+        { value: "social", label: "Traje Social" },
+        { value: "esporte_fino", label: "Esporte Fino" },
+        { value: "formal", label: "Traje Formal" },
+        { value: "black_tie", label: "Black Tie" },
+        { value: "casual", label: "Casual" },
+        { value: "casual_chic", label: "Casual Chic" },
+        { value: "personalizado", label: "Personalizado" },
+      ],
+    },
+    {
+      key: "dress_type_custom",
+      label: "Nome do traje personalizado (usado quando 'Personalizado' está selecionado)",
+      type: "text",
+    },
+    { key: "_h_men", label: "Homens", type: "heading" },
+    { key: "show_men", label: "Mostrar orientação para homens", type: "switch", fallback: true },
+    { key: "men_title", label: "Título", type: "text", placeholder: "Homens" },
+    {
+      key: "men_description",
+      label: "Descrição",
+      type: "textarea",
+      placeholder: "Terno, costume ou traje social.",
+    },
+    iconField("men_icon", "Ícone", "Shirt"),
+    { key: "_h_women", label: "Mulheres", type: "heading" },
+    {
+      key: "show_women",
+      label: "Mostrar orientação para mulheres",
+      type: "switch",
+      fallback: true,
+    },
+    { key: "women_title", label: "Título", type: "text", placeholder: "Mulheres" },
+    {
+      key: "women_description",
+      label: "Descrição",
+      type: "textarea",
+      placeholder: "Vestido, conjunto ou traje social.",
+    },
+    iconField("women_icon", "Ícone", "Gem"),
+    { key: "_h_important", label: "Observação", type: "heading" },
+    { key: "show_important", label: "Mostrar observação", type: "switch", fallback: true },
+    { key: "important_title", label: "Título", type: "text", placeholder: "Importante" },
+    {
+      key: "important_description",
+      label: "Texto",
+      type: "textarea",
+      placeholder: "Evite branco e tons muito próximos ao branco.",
+    },
+    iconField("important_icon", "Ícone", "AlertTriangle"),
+    { key: "_h_image", label: "Imagem", type: "heading" },
+    { key: "show_image", label: "Mostrar imagem", type: "switch", fallback: false },
+    { key: "image_url", label: "Imagem", type: "image" },
+    {
+      key: "image_fit",
+      label: "Ajuste da imagem",
+      type: "select",
+      fallback: "cover",
+      options: [
+        { value: "cover", label: "Preencher (cortar bordas)" },
+        { value: "contain", label: "Conter (mostrar tudo)" },
+      ],
+    },
+    {
+      key: "image_position",
+      label: "Posição da imagem",
+      type: "select",
+      fallback: "centro",
+      options: [
+        { value: "centro", label: "Centro" },
+        { value: "centro_superior", label: "Centro superior" },
+        { value: "centro_inferior", label: "Centro inferior" },
+        { value: "esquerda", label: "Esquerda" },
+        { value: "direita", label: "Direita" },
+      ],
+    },
+    {
+      key: "image_radius",
+      label: "Bordas da imagem",
+      type: "select",
+      fallback: "grande",
+      options: [
+        { value: "nenhum", label: "Sem arredondamento" },
+        { value: "pequeno", label: "Levemente arredondada" },
+        { value: "grande", label: "Bem arredondada" },
+        { value: "circular", label: "Circular" },
+      ],
+    },
+    { key: "_h_layout", label: "Layout", type: "heading" },
+    {
+      key: "layout",
+      label: "Layout",
+      type: "select",
+      fallback: "centralizado",
+      options: [
+        { value: "centralizado", label: "Centralizado (sem imagem)" },
+        { value: "imagem_esquerda", label: "Imagem à esquerda" },
+        { value: "imagem_direita", label: "Imagem à direita" },
+      ],
+    },
+    { key: "_h_appearance", label: "Aparência", type: "heading" },
+    {
+      key: "align",
+      label: "Alinhamento",
+      type: "select",
+      fallback: "centro",
+      options: [
+        { value: "esquerda", label: "Esquerda" },
+        { value: "centro", label: "Centro" },
+        { value: "direita", label: "Direita" },
+      ],
+    },
+    {
+      key: "title_size",
+      label: "Tamanho do título",
+      type: "select",
+      fallback: "grande",
+      options: [
+        { value: "medio", label: "Médio" },
+        { value: "grande", label: "Grande" },
+        { value: "extra_grande", label: "Extra grande" },
+      ],
+    },
+    { key: "bg_color", label: "Cor de fundo", type: "color" },
+    { key: "title_color", label: "Cor do título", type: "color" },
+    { key: "text_color", label: "Cor do texto", type: "color" },
+    { key: "accent_color", label: "Cor de destaque (traje)", type: "color" },
+    { key: "icon_color", label: "Cor dos ícones", type: "color" },
+    SPACING_FIELD,
   ],
-  gallery: [{ key: "description", label: "Descrição", type: "textarea" }],
+  gallery: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
   rsvp: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
+    SPACING_FIELD,
   ],
-  gifts: [{ key: "description", label: "Descrição", type: "textarea" }],
-  message: [{ key: "description", label: "Descrição", type: "textarea" }],
+  gifts: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
+  message: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
   footer: [
     { key: "text", label: "Texto do rodapé", type: "textarea" },
     { key: "instagram", label: "Instagram", type: "url" },
@@ -129,7 +374,9 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
 /** Campos extras da recepção ficam na seção de cerimônia quando não há seção própria. */
 export type SectionSettings = Record<string, unknown>;
 
-export function sectionSettings(section: Pick<WebsiteSection, "settings"> | null | undefined): SectionSettings {
+export function sectionSettings(
+  section: Pick<WebsiteSection, "settings"> | null | undefined,
+): SectionSettings {
   const raw = section?.settings;
   return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as SectionSettings) : {};
 }
