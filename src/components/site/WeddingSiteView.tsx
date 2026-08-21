@@ -27,6 +27,8 @@ import {
 } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
+import { Reveal } from "@/components/site/Reveal";
+import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import type { SectionType, WebsiteSection } from "@/types";
 
 /** Tipos de seção que aparecem como blocos independentes e reordenáveis no site. */
@@ -67,6 +69,8 @@ export type WeddingSiteData = {
     secondary_color: string;
     background_color: string;
     hero_image_url: string | null;
+    heading_font?: string | null;
+    body_font?: string | null;
   };
   sections: WebsiteSection[];
   photos: { id: string; public_url: string; caption: string | null; category: string }[];
@@ -111,9 +115,16 @@ export function WeddingSiteView({
   );
   const sectionOf = (type: SectionType) => sections.find((s) => s.section_type === type);
 
+  const headingFont = settings.heading_font || "Cormorant Garamond";
+  const bodyFont = settings.body_font || "Karla";
+  useGoogleFonts([headingFont, bodyFont]);
+
   const style = {
     ["--site-primary" as string]: settings.primary_color,
     ["--site-secondary" as string]: settings.secondary_color,
+    ["--font-display" as string]: `"${headingFont}", Georgia, serif`,
+    ["--font-sans" as string]: `"${bodyFont}", ui-sans-serif, system-ui, sans-serif`,
+    fontFamily: "var(--font-sans)",
     backgroundColor: settings.background_color,
   } as React.CSSProperties;
 
@@ -327,14 +338,15 @@ export function WeddingSiteView({
         spacing={fieldChoice(sectionOf("gallery"), "spacing", "padrao")}
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {gallery.map((photo) => (
-            <img
-              key={photo.id}
-              src={photo.public_url}
-              alt={photo.caption ?? `Foto de ${couple.display_name}`}
-              loading="lazy"
-              className="aspect-square w-full rounded-lg object-cover"
-            />
+          {gallery.map((photo, i) => (
+            <Reveal key={photo.id} delay={(i % 6) * 80}>
+              <img
+                src={photo.public_url}
+                alt={photo.caption ?? `Foto de ${couple.display_name}`}
+                loading="lazy"
+                className="aspect-square w-full rounded-lg object-cover"
+              />
+            </Reveal>
           ))}
         </div>
       </Section>
@@ -490,13 +502,10 @@ export function WeddingSiteView({
       >
         <SectionText text={fieldText(sectionOf("gifts"), "description")} />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {gifts.map((gift) => (
-            <GiftCard
-              key={gift.id}
-              gift={gift}
-              primary={settings.primary_color}
-              interactive={interactive}
-            />
+          {gifts.map((gift, i) => (
+            <Reveal key={gift.id} delay={(i % 6) * 80}>
+              <GiftCard gift={gift} primary={settings.primary_color} interactive={interactive} />
+            </Reveal>
           ))}
         </div>
       </Section>
@@ -551,7 +560,13 @@ export function WeddingSiteView({
 
       {ordered.map(({ type, node }) =>
         visible.has(type) && node ? (
-          <div key={type}>{wrap(type, sectionOf(type), node)}</div>
+          <div key={type}>
+            {type === "hero" || type === "dress_code" ? (
+              wrap(type, sectionOf(type), node)
+            ) : (
+              <Reveal>{wrap(type, sectionOf(type), node)}</Reveal>
+            )}
+          </div>
         ) : null,
       )}
 

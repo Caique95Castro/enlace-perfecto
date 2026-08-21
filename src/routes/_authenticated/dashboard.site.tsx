@@ -33,6 +33,7 @@ import {
 } from "@/hooks/useWeddingData";
 import { ensureSections, upsertSettings } from "@/services/couples";
 import { deletePhoto, uploadPhoto } from "@/services/storage";
+import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import { TEMPLATES } from "@/types";
 import type { WeddingSiteData } from "@/components/site/WeddingSiteView";
 import { cn } from "@/lib/utils";
@@ -78,6 +79,8 @@ function SiteEditorPage() {
     primary_color: "#8a6f52",
     secondary_color: "#c9b8a3",
     background_color: "#fbf8f4",
+    heading_font: "Cormorant Garamond",
+    body_font: "Karla",
   });
 
   useEffect(() => {
@@ -87,6 +90,8 @@ function SiteEditorPage() {
       primary_color: settings.primary_color ?? "#8a6f52",
       secondary_color: settings.secondary_color ?? "#c9b8a3",
       background_color: settings.background_color ?? "#fbf8f4",
+      heading_font: settings.heading_font ?? "Cormorant Garamond",
+      body_font: settings.body_font ?? "Karla",
     });
   }, [settings]);
 
@@ -183,7 +188,7 @@ function SiteEditorPage() {
             <div className="surface-card space-y-6 p-6">
               <div>
                 <h2 className="font-display text-xl font-semibold">Template</h2>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {TEMPLATES.map((t) => (
                     <button
                       key={t.slug}
@@ -195,6 +200,8 @@ function SiteEditorPage() {
                           primary_color: t.primary,
                           secondary_color: t.secondary,
                           background_color: t.background,
+                          heading_font: t.heading,
+                          body_font: t.body,
                         }))
                       }
                       className={cn(
@@ -213,12 +220,21 @@ function SiteEditorPage() {
                           />
                         ))}
                       </div>
-                      <p className="font-display text-lg font-semibold">{t.name}</p>
+                      <p
+                        className="text-lg font-semibold"
+                        style={{ fontFamily: `"${t.heading}", serif` }}
+                      >
+                        {t.name}
+                      </p>
                       <p className="mt-1 text-xs text-muted-foreground">{t.description}</p>
+                      <p className="mt-2 text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                        {t.heading} + {t.body}
+                      </p>
                     </button>
                   ))}
                 </div>
               </div>
+              <TemplateFontLoader />
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <ColorField
@@ -368,6 +384,11 @@ function SitePreviewModal({
       </div>
     </div>
   );
+}
+
+function TemplateFontLoader() {
+  useGoogleFonts(TEMPLATES.flatMap((t) => [t.heading, t.body]));
+  return null;
 }
 
 function ColorField({

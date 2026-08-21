@@ -73,7 +73,8 @@ export const SECTION_ORDER: SectionType[] = [
   "footer",
 ];
 
-export type TemplateSlug = "elegante" | "romantico" | "minimalista";
+export type TemplateSlug =
+  "elegante" | "romantico" | "minimalista" | "boho" | "tropical" | "vintage" | "moderno";
 
 export const TEMPLATES: {
   slug: TemplateSlug;
@@ -115,6 +116,46 @@ export const TEMPLATES: {
     heading: "Karla",
     body: "Karla",
   },
+  {
+    slug: "boho",
+    name: "Boho",
+    description: "Terracota e verde-oliva, clima descontraído ao ar livre.",
+    primary: "#a8623f",
+    secondary: "#8a9a6f",
+    background: "#faf3e8",
+    heading: "Playfair Display",
+    body: "Nunito",
+  },
+  {
+    slug: "tropical",
+    name: "Tropical",
+    description: "Verde-esmeralda e coral, energia leve e ensolarada.",
+    primary: "#1f6f57",
+    secondary: "#f2a488",
+    background: "#f7fbf6",
+    heading: "Fraunces",
+    body: "Mulish",
+  },
+  {
+    slug: "vintage",
+    name: "Vintage",
+    description: "Mostarda e azul-petróleo, charme de outra época.",
+    primary: "#c08a2e",
+    secondary: "#3b6b73",
+    background: "#f7f1e3",
+    heading: "EB Garamond",
+    body: "Lato",
+  },
+  {
+    slug: "moderno",
+    name: "Moderno",
+    description: "Grafite e lavanda, linhas contemporâneas e sofisticadas.",
+    primary: "#4a4560",
+    secondary: "#b7b0d8",
+    background: "#f9f8fc",
+    heading: "Marcellus",
+    body: "Inter",
+  },
 ];
 
 /** Dados completos do site público. */
@@ -127,4 +168,3 @@ export type PublicWeddingData = {
   gifts: GiftItem[];
   messages: Pick<GuestMessage, "id" | "author_name" | "message" | "photo_url" | "created_at">[];
 };
-
