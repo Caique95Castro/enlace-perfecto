@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   Gem,
@@ -11,6 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { fieldBool, fieldChoice, fieldText } from "@/lib/sections";
+import { Reveal } from "@/components/site/Reveal";
 import { cn } from "@/lib/utils";
 import type { WebsiteSection } from "@/types";
 
@@ -301,44 +301,6 @@ function GuidanceCard({
       <Icon className="size-6" style={iconColor ? { color: iconColor } : undefined} />
       <p className="font-medium">{title}</p>
       <p className="text-sm opacity-80">{description}</p>
-    </div>
-  );
-}
-
-/** Revela o conteúdo com um fade + leve deslocamento vertical quando entra na tela. */
-function Reveal({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "transition-all duration-700 ease-out motion-reduce:transition-none",
-        visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 motion-reduce:opacity-100",
-      )}
-    >
-      {children}
     </div>
   );
 }
