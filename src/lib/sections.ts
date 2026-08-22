@@ -45,6 +45,59 @@ const SPACING_FIELD: FieldDef = {
   ],
 };
 
+/** Campos de moldura (bordas, cantos e sombra) reaproveitados pelas seções de conteúdo. */
+const BORDER_FIELDS: FieldDef[] = [
+  { key: "_h_frame", label: "Moldura da seção", type: "heading" },
+  {
+    key: "border_style",
+    label: "Borda",
+    type: "select",
+    fallback: "nenhuma",
+    options: [
+      { value: "nenhuma", label: "Sem borda" },
+      { value: "fina", label: "Fina" },
+      { value: "media", label: "Média" },
+      { value: "tracejada", label: "Tracejada" },
+    ],
+  },
+  { key: "border_color", label: "Cor da borda", type: "color" },
+  {
+    key: "border_radius",
+    label: "Cantos arredondados",
+    type: "select",
+    fallback: "medio",
+    options: [
+      { value: "nenhum", label: "Retos" },
+      { value: "pequeno", label: "Levemente arredondados" },
+      { value: "medio", label: "Arredondados" },
+      { value: "grande", label: "Bem arredondados" },
+    ],
+  },
+  {
+    key: "border_shadow",
+    label: "Sombra suave",
+    type: "select",
+    fallback: "nenhuma",
+    options: [
+      { value: "nenhuma", label: "Sem sombra" },
+      { value: "suave", label: "Suave" },
+      { value: "media", label: "Média" },
+    ],
+  },
+  { key: "frame_bg", label: "Cor de fundo do quadro", type: "color" },
+  {
+    key: "frame_padding",
+    label: "Espaço interno do quadro",
+    type: "select",
+    fallback: "medio",
+    options: [
+      { value: "pequeno", label: "Pequeno" },
+      { value: "medio", label: "Médio" },
+      { value: "grande", label: "Grande" },
+    ],
+  },
+];
+
 /**
  * Campos próprios de cada seção. Os valores ficam em website_sections.settings (jsonb),
  * então o conteúdo do site público sempre vem do banco — nunca de texto fixo no código.
@@ -177,6 +230,7 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
       ],
     },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
   wedding_party: [
     { key: "description", label: "Descrição", type: "textarea" },
@@ -193,11 +247,13 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
       placeholder: "Madrinhas",
     },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
   info: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "notes", label: "Informações importantes (uma por linha)", type: "textarea" },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
   event: [
     { key: "venue_name", label: "Local da cerimônia", type: "text" },
@@ -206,12 +262,14 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "map_url", label: "Link do mapa", type: "url" },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
   location: [
     { key: "venue_name", label: "Nome do local", type: "text" },
     { key: "address", label: "Endereço", type: "text" },
     { key: "map_url", label: "Link do mapa", type: "url" },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
   dress_code: [
     { key: "_h_content", label: "Conteúdo", type: "heading" },
@@ -355,15 +413,17 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     { key: "accent_color", label: "Cor de destaque (traje)", type: "color" },
     { key: "icon_color", label: "Cor dos ícones", type: "color" },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
-  gallery: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
+  gallery: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD, ...BORDER_FIELDS],
   rsvp: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
     SPACING_FIELD,
+    ...BORDER_FIELDS,
   ],
-  gifts: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
-  message: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD],
+  gifts: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD, ...BORDER_FIELDS],
+  message: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD, ...BORDER_FIELDS],
   footer: [
     { key: "text", label: "Texto do rodapé", type: "textarea" },
     { key: "instagram", label: "Instagram", type: "url" },
@@ -434,4 +494,42 @@ export function fieldOrder(
   const saved = Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
   const valid = saved.filter((v) => fallback.includes(v));
   return [...valid, ...fallback.filter((v) => !valid.includes(v))];
+}
+
+/** Classe + estilo do quadro (borda/cantos/sombra) configurado numa seção. */
+export function sectionFrame(
+  section: Pick<WebsiteSection, "settings"> | null | undefined,
+): { className: string; style: Record<string, string> } | null {
+  const style = fieldChoice(section, "border_style", "nenhuma");
+  const shadow = fieldChoice(section, "border_shadow", "nenhuma");
+  const bg = fieldText(section, "frame_bg");
+  if (style === "nenhuma" && shadow === "nenhuma" && !bg) return null;
+
+  const radius =
+    { nenhum: "rounded-none", pequeno: "rounded-md", medio: "rounded-xl", grande: "rounded-3xl" }[
+      fieldChoice(section, "border_radius", "medio")
+    ] ?? "rounded-xl";
+  const padding =
+    { pequeno: "p-4 sm:p-5", medio: "p-6 sm:p-8", grande: "p-8 sm:p-12" }[
+      fieldChoice(section, "frame_padding", "medio")
+    ] ?? "p-6 sm:p-8";
+  const shadowClass =
+    { nenhuma: "", suave: "shadow-sm", media: "shadow-md" }[shadow] ?? "";
+  const borderClass =
+    {
+      nenhuma: "",
+      fina: "border",
+      media: "border-2",
+      tracejada: "border border-dashed",
+    }[style] ?? "";
+
+  const css: Record<string, string> = {};
+  const color = fieldText(section, "border_color");
+  if (color && borderClass) css["borderColor"] = color;
+  if (bg) css["backgroundColor"] = bg;
+
+  return {
+    className: [radius, padding, shadowClass, borderClass].filter(Boolean).join(" "),
+    style: css,
+  };
 }
