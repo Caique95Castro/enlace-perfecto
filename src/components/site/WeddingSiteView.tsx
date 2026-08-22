@@ -300,6 +300,7 @@ export function WeddingSiteView({
       <Section
         title={storySection?.title ?? "Nossa história"}
         spacing={fieldChoice(storySection, "spacing", "padrao")}
+        frame={sectionFrame(storySection)}
       >
         <div
           className={cn(
@@ -336,6 +337,7 @@ export function WeddingSiteView({
       <Section
         title={sectionOf("gallery")?.title ?? "Galeria"}
         spacing={fieldChoice(sectionOf("gallery"), "spacing", "padrao")}
+        frame={sectionFrame(sectionOf("gallery"))}
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {gallery.map((photo, i) => (
@@ -370,6 +372,7 @@ export function WeddingSiteView({
       id="cerimonia"
       title={eventSection?.title ?? "Cerimônia"}
       spacing={fieldChoice(eventSection, "spacing", "padrao")}
+        frame={sectionFrame(eventSection)}
     >
       <SectionText text={fieldText(eventSection, "description")} />
       <div className="mx-auto grid max-w-2xl gap-6 text-center sm:grid-cols-2">
@@ -403,6 +406,7 @@ export function WeddingSiteView({
       id="padrinhos"
       title={partySection?.title ?? "Padrinhos e madrinhas"}
       spacing={fieldChoice(partySection, "spacing", "padrao")}
+        frame={sectionFrame(partySection)}
     >
       <SectionText text={fieldText(partySection, "description")} />
       <div className="mx-auto grid max-w-2xl gap-6 text-center sm:grid-cols-2">
@@ -429,6 +433,7 @@ export function WeddingSiteView({
       tinted
       primary={settings.secondary_color}
       spacing={fieldChoice(locationSection, "spacing", "padrao")}
+        frame={sectionFrame(locationSection)}
     >
       <div className="text-center">
         <p className="font-medium">
@@ -468,6 +473,7 @@ export function WeddingSiteView({
       id="informacoes"
       title={infoSection?.title ?? "Informações importantes"}
       spacing={fieldChoice(infoSection, "spacing", "padrao")}
+        frame={sectionFrame(infoSection)}
     >
       <SectionText text={fieldText(infoSection, "description")} />
       {infoNotes.length > 0 ? (
@@ -487,6 +493,7 @@ export function WeddingSiteView({
       tinted
       primary={settings.secondary_color}
       spacing={fieldChoice(sectionOf("rsvp"), "spacing", "padrao")}
+        frame={sectionFrame(sectionOf("rsvp"))}
     >
       <SectionText text={fieldText(sectionOf("rsvp"), "description")} />
       <RsvpForm slug={couple.slug} interactive={interactive} />
@@ -499,6 +506,7 @@ export function WeddingSiteView({
         id="presentes"
         title={sectionOf("gifts")?.title ?? "Lista de presentes"}
         spacing={fieldChoice(sectionOf("gifts"), "spacing", "padrao")}
+        frame={sectionFrame(sectionOf("gifts"))}
       >
         <SectionText text={fieldText(sectionOf("gifts"), "description")} />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -522,6 +530,7 @@ export function WeddingSiteView({
       tinted
       primary={settings.secondary_color}
       spacing={fieldChoice(sectionOf("message"), "spacing", "padrao")}
+        frame={sectionFrame(sectionOf("message"))}
     >
       <SectionText text={fieldText(sectionOf("message"), "description")} />
       <MessageBoard slug={couple.slug} messages={messages} interactive={interactive} />
@@ -671,6 +680,7 @@ function Section({
   tinted,
   primary,
   spacing,
+  frame,
 }: {
   id?: string;
   title: string;
@@ -678,6 +688,7 @@ function Section({
   tinted?: boolean;
   primary?: string;
   spacing?: string;
+  frame?: { className: string; style: Record<string, string> } | null;
 }) {
   const spacingClass =
     { compacto: "py-8 sm:py-10", padrao: "py-16 sm:py-20", espacoso: "py-24 sm:py-32" }[
@@ -693,7 +704,13 @@ function Section({
         <h2 className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl">
           {title}
         </h2>
-        {children}
+        {frame ? (
+          <div className={frame.className} style={frame.style}>
+            {children}
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </section>
   );
