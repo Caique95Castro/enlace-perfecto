@@ -24,6 +24,7 @@ import {
   fieldText,
   linesOf,
   paragraphsOf,
+  sectionFrame,
 } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
