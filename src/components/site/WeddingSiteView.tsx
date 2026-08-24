@@ -367,6 +367,7 @@ export function WeddingSiteView({
             </Reveal>
           ))}
         </div>
+        )}
       </Section>
     ) : (
       <p className="px-4 py-8 text-center text-sm text-muted-foreground">
