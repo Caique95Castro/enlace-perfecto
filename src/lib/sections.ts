@@ -428,6 +428,42 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
       ],
     },
     {
+      key: "grid_columns",
+      label: "Colunas na grade",
+      type: "select",
+      fallback: "3",
+      options: [
+        { value: "1", label: "1 coluna" },
+        { value: "2", label: "2 colunas" },
+        { value: "3", label: "3 colunas" },
+        { value: "4", label: "4 colunas" },
+      ],
+    },
+    {
+      key: "grid_ratio",
+      label: "Formato das fotos (grade)",
+      type: "select",
+      fallback: "quadrado",
+      options: [
+        { value: "quadrado", label: "Quadrado" },
+        { value: "retrato", label: "Retrato (3:4)" },
+        { value: "paisagem", label: "Paisagem (16:9)" },
+        { value: "original", label: "Original (sem recorte)" },
+      ],
+    },
+    {
+      key: "grid_gap",
+      label: "Espaço entre as fotos",
+      type: "select",
+      fallback: "medio",
+      options: [
+        { value: "pequeno", label: "Pequeno" },
+        { value: "medio", label: "Médio" },
+        { value: "grande", label: "Grande" },
+      ],
+    },
+    { key: "show_captions", label: "Mostrar legendas das fotos", type: "switch", fallback: false },
+    {
       key: "carousel_slides",
       label: "Fotos por vez (carrossel)",
       type: "select",
@@ -451,9 +487,13 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     },
     { key: "carousel_loop", label: "Carrossel em loop", type: "switch", fallback: true },
     { key: "carousel_autoplay", label: "Passar fotos automaticamente", type: "switch" },
+    { key: "bg_color", label: "Cor de fundo da seção", type: "color" },
+    { key: "title_color", label: "Cor do título", type: "color" },
+    { key: "text_color", label: "Cor do texto", type: "color" },
     SPACING_FIELD,
     ...BORDER_FIELDS,
   ],
+
   rsvp: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },

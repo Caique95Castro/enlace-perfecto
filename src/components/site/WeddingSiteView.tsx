@@ -335,19 +335,40 @@ export function WeddingSiteView({
     );
 
   const gallerySection = sectionOf("gallery");
+  const galleryCaptions = fieldBool(gallerySection, "show_captions", false);
+  const galleryCols =
+    { "1": "grid-cols-1", "2": "grid-cols-2", "3": "grid-cols-2 sm:grid-cols-3", "4": "grid-cols-2 sm:grid-cols-4" }[
+      fieldChoice(gallerySection, "grid_columns", "3")
+    ] ?? "grid-cols-2 sm:grid-cols-3";
+  const galleryRatio =
+    {
+      quadrado: "aspect-square",
+      retrato: "aspect-[3/4]",
+      paisagem: "aspect-[16/9]",
+      original: "",
+    }[fieldChoice(gallerySection, "grid_ratio", "quadrado")] ?? "aspect-square";
+  const galleryGap =
+    { pequeno: "gap-1.5", medio: "gap-3", grande: "gap-6" }[
+      fieldChoice(gallerySection, "grid_gap", "medio")
+    ] ?? "gap-3";
+
   const galleryBlock =
     gallery.length > 0 ? (
       <Section
         title={gallerySection?.title ?? "Galeria"}
         spacing={fieldChoice(gallerySection, "spacing", "padrao")}
         frame={sectionFrame(gallerySection)}
+        bgColor={fieldText(gallerySection, "bg_color")}
+        titleColor={fieldText(gallerySection, "title_color")}
+        textColor={fieldText(gallerySection, "text_color")}
       >
+        <SectionText text={fieldText(gallerySection, "description")} />
         {fieldChoice(gallerySection, "display_mode", "grade") === "carrossel" ? (
           <GalleryCarousel
             photos={gallery.map((p) => ({
               id: p.id,
               url: p.public_url,
-              caption: p.caption ?? null,
+              caption: galleryCaptions ? (p.caption ?? null) : null,
             }))}
             coupleName={couple.display_name}
             perView={Number(fieldChoice(gallerySection, "carousel_slides", "1")) || 1}
@@ -356,25 +377,43 @@ export function WeddingSiteView({
             autoplay={fieldBool(gallerySection, "carousel_autoplay", false)}
           />
         ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {gallery.map((photo, i) => (
-            <Reveal key={photo.id} delay={(i % 6) * 80}>
-              <img
-                src={photo.public_url}
-                alt={photo.caption ?? `Foto de ${couple.display_name}`}
-                loading="lazy"
-                className="aspect-square w-full rounded-lg object-cover"
-              />
-            </Reveal>
-          ))}
-        </div>
+          <div className={cn("grid", galleryCols, galleryGap)}>
+            {gallery.map((photo, i) => (
+              <Reveal key={photo.id} delay={(i % 6) * 80}>
+                <figure>
+                  <img
+                    src={photo.public_url}
+                    alt={photo.caption ?? `Foto de ${couple.display_name}`}
+                    loading="lazy"
+                    className={cn("w-full rounded-lg object-cover", galleryRatio)}
+                  />
+                  {galleryCaptions && photo.caption ? (
+                    <figcaption className="mt-2 text-center text-xs opacity-70">
+                      {photo.caption}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              </Reveal>
+            ))}
+          </div>
         )}
       </Section>
     ) : (
-      <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-        Envie fotos na aba "Fotos" para preencher a galeria.
-      </p>
+      <Section
+        title={gallerySection?.title ?? "Galeria"}
+        spacing={fieldChoice(gallerySection, "spacing", "padrao")}
+        frame={sectionFrame(gallerySection)}
+        bgColor={fieldText(gallerySection, "bg_color")}
+        titleColor={fieldText(gallerySection, "title_color")}
+        textColor={fieldText(gallerySection, "text_color")}
+      >
+        <SectionText text={fieldText(gallerySection, "description")} />
+        <p className="text-center text-sm text-muted-foreground">
+          Envie fotos na aba "Fotos" para preencher a galeria.
+        </p>
+      </Section>
     );
+
 
   const eventSection = sectionOf("event");
   const eventVenue =
@@ -699,6 +738,9 @@ function Section({
   primary,
   spacing,
   frame,
+  bgColor,
+  titleColor,
+  textColor,
 }: {
   id?: string;
   title: string;
@@ -707,22 +749,33 @@ function Section({
   primary?: string;
   spacing?: string;
   frame?: { className: string; style: Record<string, string> } | null;
+  bgColor?: string;
+  titleColor?: string;
+  textColor?: string;
 }) {
   const spacingClass =
     { compacto: "py-8 sm:py-10", padrao: "py-16 sm:py-20", espacoso: "py-24 sm:py-32" }[
       spacing ?? "padrao"
     ] ?? "py-16 sm:py-20";
+  const sectionStyle: Record<string, string> = {};
+  if (bgColor) sectionStyle["backgroundColor"] = bgColor;
+  else if (tinted && primary) sectionStyle["backgroundColor"] = `${primary}33`;
+  if (textColor) sectionStyle["color"] = textColor;
   return (
     <section
       id={id}
       className={cn("px-4", spacingClass)}
-      style={tinted && primary ? { backgroundColor: `${primary}33` } : undefined}
+      style={Object.keys(sectionStyle).length > 0 ? sectionStyle : undefined}
     >
       <div className="mx-auto max-w-4xl">
-        <h2 className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl">
+        <h2
+          className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl"
+          style={titleColor ? { color: titleColor } : undefined}
+        >
           {title}
         </h2>
         {frame ? (
+
           <div className={frame.className} style={frame.style}>
             {children}
           </div>
