@@ -29,6 +29,7 @@ import {
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
 import { Reveal } from "@/components/site/Reveal";
+import { GalleryCarousel } from "@/components/site/GalleryCarousel";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import type { SectionType, WebsiteSection } from "@/types";
 

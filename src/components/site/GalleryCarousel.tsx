@@ -57,7 +57,7 @@ export function GalleryCarousel({
 
   const basis =
     perView >= 3 ? "sm:basis-1/3" : perView === 2 ? "sm:basis-1/2" : "basis-full";
-  const aspect = RATIOS[ratio] ?? RATIOS.quadrado;
+  const aspect = RATIOS[ratio] ?? "aspect-square";
 
   return (
     <div className="relative">
