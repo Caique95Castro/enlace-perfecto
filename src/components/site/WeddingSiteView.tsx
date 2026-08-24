@@ -738,6 +738,9 @@ function Section({
   primary,
   spacing,
   frame,
+  bgColor,
+  titleColor,
+  textColor,
 }: {
   id?: string;
   title: string;
@@ -746,22 +749,33 @@ function Section({
   primary?: string;
   spacing?: string;
   frame?: { className: string; style: Record<string, string> } | null;
+  bgColor?: string;
+  titleColor?: string;
+  textColor?: string;
 }) {
   const spacingClass =
     { compacto: "py-8 sm:py-10", padrao: "py-16 sm:py-20", espacoso: "py-24 sm:py-32" }[
       spacing ?? "padrao"
     ] ?? "py-16 sm:py-20";
+  const sectionStyle: Record<string, string> = {};
+  if (bgColor) sectionStyle["backgroundColor"] = bgColor;
+  else if (tinted && primary) sectionStyle["backgroundColor"] = `${primary}33`;
+  if (textColor) sectionStyle["color"] = textColor;
   return (
     <section
       id={id}
       className={cn("px-4", spacingClass)}
-      style={tinted && primary ? { backgroundColor: `${primary}33` } : undefined}
+      style={Object.keys(sectionStyle).length > 0 ? sectionStyle : undefined}
     >
       <div className="mx-auto max-w-4xl">
-        <h2 className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl">
+        <h2
+          className="mb-8 text-center font-display text-3xl font-semibold sm:text-4xl"
+          style={titleColor ? { color: titleColor } : undefined}
+        >
           {title}
         </h2>
         {frame ? (
+
           <div className={frame.className} style={frame.style}>
             {children}
           </div>
