@@ -415,7 +415,45 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     SPACING_FIELD,
     ...BORDER_FIELDS,
   ],
-  gallery: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD, ...BORDER_FIELDS],
+  gallery: [
+    { key: "description", label: "Descrição", type: "textarea" },
+    {
+      key: "display_mode",
+      label: "Exibição das fotos",
+      type: "select",
+      fallback: "grade",
+      options: [
+        { value: "grade", label: "Grade (mosaico)" },
+        { value: "carrossel", label: "Carrossel (deslizar)" },
+      ],
+    },
+    {
+      key: "carousel_slides",
+      label: "Fotos por vez (carrossel)",
+      type: "select",
+      fallback: "1",
+      options: [
+        { value: "1", label: "1 foto" },
+        { value: "2", label: "2 fotos" },
+        { value: "3", label: "3 fotos" },
+      ],
+    },
+    {
+      key: "carousel_ratio",
+      label: "Formato das fotos (carrossel)",
+      type: "select",
+      fallback: "quadrado",
+      options: [
+        { value: "quadrado", label: "Quadrado" },
+        { value: "retrato", label: "Retrato (3:4)" },
+        { value: "paisagem", label: "Paisagem (16:9)" },
+      ],
+    },
+    { key: "carousel_loop", label: "Carrossel em loop", type: "switch", fallback: true },
+    { key: "carousel_autoplay", label: "Passar fotos automaticamente", type: "switch" },
+    SPACING_FIELD,
+    ...BORDER_FIELDS,
+  ],
   rsvp: [
     { key: "description", label: "Descrição", type: "textarea" },
     { key: "cta_label", label: "Texto do botão", type: "text", placeholder: "Confirmar presença" },
