@@ -29,6 +29,7 @@ import {
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
 import { Reveal } from "@/components/site/Reveal";
+import { GalleryCarousel } from "@/components/site/GalleryCarousel";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import type { SectionType, WebsiteSection } from "@/types";
 
@@ -333,13 +334,28 @@ export function WeddingSiteView({
       </p>
     );
 
+  const gallerySection = sectionOf("gallery");
   const galleryBlock =
     gallery.length > 0 ? (
       <Section
-        title={sectionOf("gallery")?.title ?? "Galeria"}
-        spacing={fieldChoice(sectionOf("gallery"), "spacing", "padrao")}
-        frame={sectionFrame(sectionOf("gallery"))}
+        title={gallerySection?.title ?? "Galeria"}
+        spacing={fieldChoice(gallerySection, "spacing", "padrao")}
+        frame={sectionFrame(gallerySection)}
       >
+        {fieldChoice(gallerySection, "display_mode", "grade") === "carrossel" ? (
+          <GalleryCarousel
+            photos={gallery.map((p) => ({
+              id: p.id,
+              url: p.public_url,
+              caption: p.caption ?? null,
+            }))}
+            coupleName={couple.display_name}
+            perView={Number(fieldChoice(gallerySection, "carousel_slides", "1")) || 1}
+            ratio={fieldChoice(gallerySection, "carousel_ratio", "quadrado")}
+            loop={fieldBool(gallerySection, "carousel_loop", true)}
+            autoplay={fieldBool(gallerySection, "carousel_autoplay", false)}
+          />
+        ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {gallery.map((photo, i) => (
             <Reveal key={photo.id} delay={(i % 6) * 80}>
@@ -352,6 +368,7 @@ export function WeddingSiteView({
             </Reveal>
           ))}
         </div>
+        )}
       </Section>
     ) : (
       <p className="px-4 py-8 text-center text-sm text-muted-foreground">
