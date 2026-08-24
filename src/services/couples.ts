@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/format";
+import { sectionSettings } from "@/lib/sections";
 import type { Couple, Wedding, WebsiteSettings, WebsiteSection, SectionType } from "@/types";
 import { SECTION_ORDER, SECTION_LABELS } from "@/types";
 
@@ -68,7 +69,9 @@ export async function createCouple(input: CreateCoupleInput): Promise<Couple> {
   if (error) throw error;
 
   await Promise.all([
-    supabase.from("weddings").insert({ couple_id: couple.id, title: `Casamento de ${displayName}` }),
+    supabase
+      .from("weddings")
+      .insert({ couple_id: couple.id, title: `Casamento de ${displayName}` }),
     supabase.from("website_settings").insert({ couple_id: couple.id }),
     supabase.from("subscriptions").insert({ couple_id: couple.id, plan: "free", status: "active" }),
     createDefaultSections(couple.id),
@@ -111,10 +114,7 @@ export async function getWedding(coupleId: string): Promise<Wedding | null> {
   return data;
 }
 
-export async function upsertWedding(
-  coupleId: string,
-  values: Partial<Wedding>,
-): Promise<Wedding> {
+export async function upsertWedding(coupleId: string, values: Partial<Wedding>): Promise<Wedding> {
   const { data, error } = await supabase
     .from("weddings")
     .upsert({ couple_id: coupleId, ...values }, { onConflict: "couple_id" })
@@ -212,4 +212,59 @@ export async function updateSectionSettings(
   values?: Partial<WebsiteSection>,
 ): Promise<WebsiteSection> {
   return updateSection(id, { ...(values ?? {}), settings: settings as never });
+}
+
+/**
+ * Aplica os ajustes de layout de um "Layout pronto" (altura/alinhamento/tamanho do banner,
+ * disposição da história e espaçamento das seções de conteúdo) às seções já existentes do
+ * casal. Mescla com o `settings` (jsonb) já salvo de cada seção — nunca sobrescreve textos,
+ * imagens ou outros campos que o casal já tenha personalizado.
+ */
+export async function applyTemplateLayout(
+  sections: WebsiteSection[],
+  template: {
+    heroHeight: string;
+    heroAlign: string;
+    heroTitleSize: string;
+    storyLayout: string;
+    spacing: string;
+  },
+): Promise<void> {
+  const spacedTypes = new Set([
+    "story",
+    "gallery",
+    "event",
+    "location",
+    "wedding_party",
+    "info",
+    "rsvp",
+    "gifts",
+    "message",
+    "dress_code",
+  ]);
+
+  const updates = sections
+    .map((section) => {
+      const type = section.section_type;
+      const current = sectionSettings(section);
+      let next: Record<string, unknown> | null = null;
+
+      if (type === "hero") {
+        next = {
+          ...current,
+          height: template.heroHeight,
+          content_align: template.heroAlign,
+          title_size: template.heroTitleSize,
+        };
+      } else if (type === "story") {
+        next = { ...current, layout: template.storyLayout, spacing: template.spacing };
+      } else if (spacedTypes.has(type)) {
+        next = { ...current, spacing: template.spacing };
+      }
+
+      return next ? { id: section.id, settings: next } : null;
+    })
+    .filter((u): u is { id: string; settings: Record<string, unknown> } => u !== null);
+
+  await Promise.all(updates.map((u) => updateSectionSettings(u.id, u.settings)));
 }

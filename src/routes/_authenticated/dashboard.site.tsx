@@ -31,7 +31,7 @@ import {
   useSettings,
   useWedding,
 } from "@/hooks/useWeddingData";
-import { ensureSections, upsertSettings } from "@/services/couples";
+import { applyTemplateLayout, ensureSections, upsertSettings } from "@/services/couples";
 import { deletePhoto, uploadPhoto } from "@/services/storage";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import { TEMPLATES } from "@/types";
@@ -187,13 +187,17 @@ function SiteEditorPage() {
           <TabsContent value="aparencia" className="mt-5">
             <div className="surface-card space-y-6 p-6">
               <div>
-                <h2 className="font-display text-xl font-semibold">Template</h2>
+                <h2 className="font-display text-xl font-semibold">Layouts prontos</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Cada opção já define cores, fontes, altura/alinhamento do banner, disposição da
+                  história e espaçamento das seções — tudo de uma vez.
+                </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {TEMPLATES.map((t) => (
                     <button
                       key={t.slug}
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
                         setStyle((s) => ({
                           ...s,
                           template_slug: t.slug,
@@ -202,8 +206,14 @@ function SiteEditorPage() {
                           background_color: t.background,
                           heading_font: t.heading,
                           body_font: t.body,
-                        }))
-                      }
+                        }));
+                        void applyTemplateLayout(sections, t)
+                          .then(() =>
+                            queryClient.invalidateQueries({ queryKey: ["sections", couple?.id] }),
+                          )
+                          .then(() => toast.success(`Layout "${t.name}" aplicado às seções.`))
+                          .catch(() => toast.error("Não foi possível aplicar o layout às seções."));
+                      }}
                       className={cn(
                         "rounded-xl border p-4 text-left transition-all",
                         style.template_slug === t.slug
@@ -234,6 +244,11 @@ function SiteEditorPage() {
                   ))}
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground">
+                As cores e fontes só valem depois de clicar em "Salvar aparência" — mas o layout do
+                banner, da história e o espaçamento das seções já ficam salvos assim que você
+                escolhe um layout pronto.
+              </p>
               <TemplateFontLoader />
 
               <div className="grid gap-4 sm:grid-cols-3">
