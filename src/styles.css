@@ -179,3 +179,30 @@
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------
+   Skins dos "Layouts prontos" (camada visual opcional do site público).
+   Só entram em ação quando o casal aplica um modelo da biblioteca.
+   --------------------------------------------------------------- */
+
+@utility site-skin-paper {
+  background-image:
+    radial-gradient(circle at 20% 10%, rgb(255 255 255 / 55%), transparent 45%),
+    radial-gradient(circle at 85% 60%, rgb(255 255 255 / 40%), transparent 40%),
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 2%) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 2%) 0 1px, transparent 1px 4px);
+}
+
+@utility site-skin-romantic {
+  background-image:
+    radial-gradient(circle at 10% 20%, rgb(255 255 255 / 60%), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgb(255 255 255 / 50%), transparent 40%);
+}
+
+@utility site-skin-editorial {
+  background-image: linear-gradient(180deg, rgb(0 0 0 / 3%), transparent 25%);
+}
+
+@utility site-skin-classic {
+  background-image: radial-gradient(circle at 50% 0%, rgb(255 255 255 / 60%), transparent 55%);
+}
