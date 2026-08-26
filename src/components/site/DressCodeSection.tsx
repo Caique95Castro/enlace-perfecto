@@ -118,6 +118,16 @@ export function DressCodeSection({
     fieldText(section, "women_description") || "Vestido, conjunto ou traje social.";
   const WomenIcon = resolveIcon(fieldChoice(section, "women_icon", "Gem"), Gem);
 
+  const showPartyColors = fieldBool(section, "show_wedding_party_colors", false);
+  const partyColorsTitle =
+    fieldText(section, "wedding_party_colors_title") || "Cores dos padrinhos e madrinhas";
+  const groomsmenLabel = fieldText(section, "groomsmen_label") || "Padrinhos";
+  const groomsmenColor = fieldText(section, "groomsmen_color");
+  const bridesmaidsLabel = fieldText(section, "bridesmaids_label") || "Madrinhas";
+  const bridesmaidsColor = fieldText(section, "bridesmaids_color");
+  const partyColorsNote = fieldText(section, "wedding_party_colors_note");
+  const hasPartyColors = showPartyColors && Boolean(groomsmenColor || bridesmaidsColor);
+
   const showImportant = fieldBool(section, "show_important", true);
   const importantTitle = fieldText(section, "important_title") || "Importante";
   const importantDescription =
@@ -214,6 +224,19 @@ export function DressCodeSection({
         </div>
       ) : null}
 
+      {hasPartyColors ? (
+        <div className="mt-8 w-full max-w-xl">
+          <p className="text-sm font-semibold">{partyColorsTitle}</p>
+          <div className="mt-3 flex flex-wrap gap-4">
+            {groomsmenColor ? <ColorSwatch label={groomsmenLabel} color={groomsmenColor} /> : null}
+            {bridesmaidsColor ? (
+              <ColorSwatch label={bridesmaidsLabel} color={bridesmaidsColor} />
+            ) : null}
+          </div>
+          {partyColorsNote ? <p className="mt-3 text-sm opacity-80">{partyColorsNote}</p> : null}
+        </div>
+      ) : null}
+
       {showImportant && importantDescription ? (
         <div
           className={cn(
@@ -275,6 +298,22 @@ export function DressCodeSection({
         )}
       </section>
     </Reveal>
+  );
+}
+
+function ColorSwatch({ label, color }: { label: string; color: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span
+        className="size-8 shrink-0 rounded-full border border-black/10 shadow-sm"
+        style={{ backgroundColor: color }}
+        aria-hidden="true"
+      />
+      <div className="text-left">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-xs uppercase opacity-60">{color}</p>
+      </div>
+    </div>
   );
 }
 

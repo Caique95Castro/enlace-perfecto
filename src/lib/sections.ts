@@ -384,6 +384,39 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
         { value: "imagem_direita", label: "Imagem à direita" },
       ],
     },
+    { key: "_h_wedding_party_colors", label: "Cores dos padrinhos e madrinhas", type: "heading" },
+    {
+      key: "show_wedding_party_colors",
+      label: "Mostrar cores para padrinhos e madrinhas",
+      type: "switch",
+      fallback: false,
+    },
+    {
+      key: "wedding_party_colors_title",
+      label: "Título",
+      type: "text",
+      placeholder: "Cores dos padrinhos e madrinhas",
+    },
+    {
+      key: "groomsmen_label",
+      label: "Rótulo — trajes masculinos",
+      type: "text",
+      placeholder: "Padrinhos",
+    },
+    { key: "groomsmen_color", label: "Cor — trajes masculinos", type: "color" },
+    {
+      key: "bridesmaids_label",
+      label: "Rótulo — trajes femininos",
+      type: "text",
+      placeholder: "Madrinhas",
+    },
+    { key: "bridesmaids_color", label: "Cor — trajes femininos", type: "color" },
+    {
+      key: "wedding_party_colors_note",
+      label: "Observação (opcional)",
+      type: "textarea",
+      placeholder: "Pedimos que padrinhos e madrinhas sigam essas cores no dia do casamento.",
+    },
     { key: "_h_appearance", label: "Aparência", type: "heading" },
     {
       key: "align",
@@ -500,8 +533,16 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     SPACING_FIELD,
     ...BORDER_FIELDS,
   ],
-  gifts: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD, ...BORDER_FIELDS],
-  message: [{ key: "description", label: "Descrição", type: "textarea" }, SPACING_FIELD, ...BORDER_FIELDS],
+  gifts: [
+    { key: "description", label: "Descrição", type: "textarea" },
+    SPACING_FIELD,
+    ...BORDER_FIELDS,
+  ],
+  message: [
+    { key: "description", label: "Descrição", type: "textarea" },
+    SPACING_FIELD,
+    ...BORDER_FIELDS,
+  ],
   footer: [
     { key: "text", label: "Texto do rodapé", type: "textarea" },
     { key: "instagram", label: "Instagram", type: "url" },
@@ -591,8 +632,7 @@ export function sectionFrame(
     { pequeno: "p-4 sm:p-5", medio: "p-6 sm:p-8", grande: "p-8 sm:p-12" }[
       fieldChoice(section, "frame_padding", "medio")
     ] ?? "p-6 sm:p-8";
-  const shadowClass =
-    { nenhuma: "", suave: "shadow-sm", media: "shadow-md" }[shadow] ?? "";
+  const shadowClass = { nenhuma: "", suave: "shadow-sm", media: "shadow-md" }[shadow] ?? "";
   const borderClass =
     {
       nenhuma: "",
