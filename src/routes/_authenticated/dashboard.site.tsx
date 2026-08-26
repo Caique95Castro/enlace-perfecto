@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SectionsBuilder } from "@/components/dashboard/SectionsBuilder";
+import { LayoutLibrary } from "@/components/dashboard/LayoutLibrary";
 import {
   VisualSiteEditor,
   VisualSiteEditorSkeleton,
@@ -171,10 +172,17 @@ function SiteEditorPage() {
         <Tabs defaultValue="visual">
           <TabsList>
             <TabsTrigger value="visual">Editor visual</TabsTrigger>
+            <TabsTrigger value="layouts">✨ Layouts</TabsTrigger>
             <TabsTrigger value="aparencia">Aparência</TabsTrigger>
             <TabsTrigger value="secoes">Seções</TabsTrigger>
             <TabsTrigger value="fotos">Fotos</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="layouts" className="mt-5">
+            {couple ? (
+              <LayoutLibrary coupleId={couple.id} sections={sections} settings={settings} />
+            ) : null}
+          </TabsContent>
 
           <TabsContent value="visual" className="mt-5">
             {couple && siteData ? (
