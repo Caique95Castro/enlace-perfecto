@@ -279,7 +279,7 @@ function SectionPresetLibrary({
         Opcional: aplique um estilo diferente só numa seção, sem mexer no resto do site.
       </p>
 
-      <Tabs defaultValue={available[0]} className="mt-4">
+      <Tabs defaultValue={available[0] as string} className="mt-4">
         <TabsList className="flex-wrap">
           {available.map((t) => (
             <TabsTrigger key={t} value={t}>
