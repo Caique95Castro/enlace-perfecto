@@ -28,6 +28,9 @@ import {
 } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
+import { siteSkin } from "@/lib/layout-presets";
+import { SkinBackdrop, SkinDivider, skinRootClass } from "@/components/site/LayoutSkin";
+
 import { Reveal } from "@/components/site/Reveal";
 import { GalleryCarousel } from "@/components/site/GalleryCarousel";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
