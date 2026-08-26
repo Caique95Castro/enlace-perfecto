@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  Check,
   ExternalLink,
   ImagePlus,
   Loader2,
@@ -34,6 +35,7 @@ import {
 import { applyTemplateLayout, ensureSections, upsertSettings } from "@/services/couples";
 import { deletePhoto, uploadPhoto } from "@/services/storage";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
+import { VISUAL_STYLES } from "@/lib/visual-styles";
 import { TEMPLATES } from "@/types";
 import type { WeddingSiteData } from "@/components/site/WeddingSiteView";
 import { cn } from "@/lib/utils";
@@ -173,6 +175,7 @@ function SiteEditorPage() {
             <TabsTrigger value="visual">Editor visual</TabsTrigger>
             <TabsTrigger value="aparencia">Aparência</TabsTrigger>
             <TabsTrigger value="secoes">Seções</TabsTrigger>
+            <TabsTrigger value="layouts">✨ Layouts</TabsTrigger>
             <TabsTrigger value="fotos">Fotos</TabsTrigger>
           </TabsList>
 
@@ -182,6 +185,15 @@ function SiteEditorPage() {
             ) : (
               <VisualSiteEditorSkeleton />
             )}
+          </TabsContent>
+
+          <TabsContent value="layouts" className="mt-5">
+            {couple ? (
+              <VisualStyleGallery
+                coupleId={couple.id}
+                current={settings?.visual_style ?? "nenhum"}
+              />
+            ) : null}
           </TabsContent>
 
           <TabsContent value="aparencia" className="mt-5">
@@ -404,6 +416,111 @@ function SitePreviewModal({
 function TemplateFontLoader() {
   useGoogleFonts(TEMPLATES.flatMap((t) => [t.heading, t.body]));
   return null;
+}
+
+/**
+ * Biblioteca de layouts (estilos visuais decorativos). Fica isolada das seções e do
+ * "Aparência" — aqui o casal escolhe um estilo puramente decorativo (motivos, texturas,
+ * divisores, animações) que é aplicado sobre a estrutura de seções já existente, sem alterar
+ * texto, fotos ou qualquer outra configuração.
+ */
+function VisualStyleGallery({ coupleId, current }: { coupleId: string; current: string }) {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [applying, setApplying] = useState<string | null>(null);
+
+  async function apply(slug: string) {
+    setApplying(slug);
+    try {
+      await upsertSettings(coupleId, { visual_style: slug });
+      await queryClient.invalidateQueries({ queryKey: ["settings", coupleId] });
+      toast.success(slug === "nenhum" ? "Visual original restaurado." : "Estilo aplicado ao site.");
+      setExpanded(null);
+    } catch {
+      toast.error("Não foi possível aplicar o estilo.");
+    } finally {
+      setApplying(null);
+    }
+  }
+
+  return (
+    <div className="surface-card space-y-6 p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-display text-xl font-semibold">Biblioteca de layouts</h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Estilos decorativos prontos (motivos, texturas e animações) aplicados por cima do seu
+            site — sem apagar textos, fotos ou qualquer configuração já feita.
+          </p>
+        </div>
+        {current !== "nenhum" ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void apply("nenhum")}
+            disabled={!!applying}
+          >
+            {applying === "nenhum" ? <Loader2 className="size-4 animate-spin" /> : null}
+            Restaurar visual original
+          </Button>
+        ) : null}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {VISUAL_STYLES.filter((s) => s.slug !== "nenhum").map((s) => (
+          <div
+            key={s.slug}
+            className={cn(
+              "flex flex-col rounded-xl border p-4",
+              current === s.slug ? "border-primary ring-2 ring-primary/25" : "border-border",
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{s.emoji}</span>
+              <p className="font-display text-lg font-semibold">{s.name}</p>
+              {current === s.slug ? (
+                <span className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                  Ativo
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
+
+            {expanded === s.slug ? (
+              <ul className="mt-3 space-y-1.5 text-sm">
+                {s.includes.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <Check className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                    <span className="text-muted-foreground">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            <div className="mt-4 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => setExpanded((e) => (e === s.slug ? null : s.slug))}
+              >
+                {expanded === s.slug ? "Ver menos" : "Ver detalhes"}
+              </Button>
+              <Button
+                size="sm"
+                className="flex-1"
+                onClick={() => void apply(s.slug)}
+                disabled={!!applying || current === s.slug}
+              >
+                {applying === s.slug ? <Loader2 className="size-4 animate-spin" /> : null}
+                {current === s.slug ? "Aplicado" : "Aplicar"}
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ColorField({

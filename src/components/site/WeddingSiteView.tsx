@@ -28,6 +28,12 @@ import {
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
 import { Reveal } from "@/components/site/Reveal";
+import {
+  HeroDecoration,
+  SectionDivider,
+  textureStyle,
+} from "@/components/site/VisualStyleDecorations";
+import { getVisualStyle } from "@/lib/visual-styles";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import type { SectionType, WebsiteSection } from "@/types";
 
@@ -71,6 +77,7 @@ export type WeddingSiteData = {
     hero_image_url: string | null;
     heading_font?: string | null;
     body_font?: string | null;
+    visual_style?: string | null;
   };
   sections: WebsiteSection[];
   photos: { id: string; public_url: string; caption: string | null; category: string }[];
@@ -119,13 +126,17 @@ export function WeddingSiteView({
   const bodyFont = settings.body_font || "Karla";
   useGoogleFonts([headingFont, bodyFont]);
 
+  const visualStyle = getVisualStyle(settings.visual_style);
+
   const style = {
     ["--site-primary" as string]: settings.primary_color,
     ["--site-secondary" as string]: settings.secondary_color,
+    ["--site-bg" as string]: settings.background_color,
     ["--font-display" as string]: `"${headingFont}", Georgia, serif`,
     ["--font-sans" as string]: `"${bodyFont}", ui-sans-serif, system-ui, sans-serif`,
     fontFamily: "var(--font-sans)",
     backgroundColor: settings.background_color,
+    ...textureStyle(visualStyle, settings.secondary_color),
   } as React.CSSProperties;
 
   const gallery = photos.filter((p) => p.category === "gallery");
@@ -205,6 +216,7 @@ export function WeddingSiteView({
           {heroOverlay ? <div className="absolute inset-0 bg-black/35" /> : null}
         </>
       ) : null}
+      <HeroDecoration style={visualStyle} primaryColor={settings.primary_color} />
       <div
         className={cn(
           "relative flex w-full flex-col",
@@ -558,17 +570,23 @@ export function WeddingSiteView({
     <div style={style} className="min-h-screen text-neutral-800">
       {visible.has("header") ? <SiteHeader section={headerSection} couple={couple} /> : null}
 
-      {ordered.map(({ type, node }) =>
-        visible.has(type) && node ? (
+      {(() => {
+        const visibleBlocks = ordered.filter(({ type, node }) => visible.has(type) && node);
+        return visibleBlocks.map(({ type, node }, i) => (
           <div key={type}>
+            {i > 0 ? (
+              <div className="py-2">
+                <SectionDivider style={visualStyle} primaryColor={settings.primary_color} />
+              </div>
+            ) : null}
             {type === "hero" || type === "dress_code" ? (
               wrap(type, sectionOf(type), node)
             ) : (
               <Reveal>{wrap(type, sectionOf(type), node)}</Reveal>
             )}
           </div>
-        ) : null,
-      )}
+        ));
+      })()}
 
       {visible.has("footer") ? (
         <footer className="px-4 py-12 text-center text-sm">
