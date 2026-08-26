@@ -87,7 +87,7 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
     perType: {
       hero: { height: "grande", content_align: "centro", title_size: "extra_grande", overlay: true },
       story: { layout: "side", align: "left", spacing: "espacoso" },
-      gallery: { mode: "carousel", ratio: "retrato", per_view: "3", loop: true },
+      gallery: { display_mode: "carrossel", carousel_ratio: "retrato", carousel_slides: "3", carousel_loop: true },
     },
   },
   {
@@ -121,7 +121,7 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
     perType: {
       hero: { height: "grande", content_align: "centro", title_size: "extra_grande" },
       story: { layout: "stacked", align: "center" },
-      gallery: { mode: "grid", ratio: "quadrado", columns: "3" },
+      gallery: { display_mode: "grade", grid_ratio: "quadrado", grid_columns: "3" },
     },
   },
   {
@@ -154,7 +154,7 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
     perType: {
       hero: { height: "compacto", content_align: "esquerda", title_size: "medio", overlay: false },
       story: { layout: "stacked", align: "left" },
-      gallery: { mode: "grid", ratio: "quadrado", columns: "4" },
+      gallery: { display_mode: "grade", grid_ratio: "quadrado", grid_columns: "4" },
     },
   },
   {
@@ -192,7 +192,7 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
         overlay: true,
       },
       story: { layout: "side", align: "left" },
-      gallery: { mode: "grid", ratio: "retrato", columns: "2" },
+      gallery: { display_mode: "grade", grid_ratio: "retrato", grid_columns: "2" },
     },
   },
   {
@@ -226,7 +226,7 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
     perType: {
       hero: { height: "grande", content_align: "centro", title_size: "grande" },
       story: { layout: "stacked", align: "center" },
-      gallery: { mode: "grid", ratio: "paisagem", columns: "3" },
+      gallery: { display_mode: "grade", grid_ratio: "paisagem", grid_columns: "3" },
     },
   },
 ];
@@ -363,14 +363,14 @@ export const SECTION_PRESETS: Partial<Record<SectionType, SectionPreset[]>> = {
       name: "Grid",
       description: "Grade clássica de fotos quadradas.",
       skin: "none",
-      patch: { mode: "grid", columns: "3", ratio: "quadrado" },
+      patch: { display_mode: "grade", grid_columns: "3", grid_ratio: "quadrado" },
     },
     {
       id: "gallery-masonry",
       name: "Masonry",
       description: "Grade de duas colunas com fotos em retrato.",
       skin: "none",
-      patch: { mode: "grid", columns: "2", ratio: "retrato" },
+      patch: { display_mode: "grade", grid_columns: "2", grid_ratio: "retrato" },
     },
     {
       id: "gallery-polaroid",
@@ -378,9 +378,9 @@ export const SECTION_PRESETS: Partial<Record<SectionType, SectionPreset[]>> = {
       description: "Fotos com moldura branca e legendas visíveis.",
       skin: "romantic",
       patch: {
-        mode: "grid",
-        columns: "3",
-        ratio: "quadrado",
+        display_mode: "grade",
+        grid_columns: "3",
+        grid_ratio: "quadrado",
         show_captions: true,
         frame_bg: "#ffffff",
         border_style: "fina",
@@ -393,7 +393,7 @@ export const SECTION_PRESETS: Partial<Record<SectionType, SectionPreset[]>> = {
       name: "Carrossel Editorial",
       description: "Carrossel com fotos grandes em retrato.",
       skin: "editorial",
-      patch: { mode: "carousel", per_view: "2", ratio: "retrato", loop: true },
+      patch: { display_mode: "carrossel", carousel_slides: "2", carousel_ratio: "retrato", carousel_loop: true },
     },
   ],
   footer: [
