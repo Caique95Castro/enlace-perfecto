@@ -28,6 +28,9 @@ import {
 } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { DressCodeSection } from "@/components/site/DressCodeSection";
+import { siteSkin } from "@/lib/layout-presets";
+import { SkinBackdrop, SkinDivider, skinRootClass } from "@/components/site/LayoutSkin";
+
 import { Reveal } from "@/components/site/Reveal";
 import { GalleryCarousel } from "@/components/site/GalleryCarousel";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
@@ -620,21 +623,32 @@ export function WeddingSiteView({
     sections.find((s) => s.section_type === type)?.position ?? 999;
   const ordered = [...blocks].sort((a, b) => orderOf(a.type) - orderOf(b.type));
 
-  return (
-    <div style={style} className="min-h-screen text-neutral-800">
-      {visible.has("header") ? <SiteHeader section={headerSection} couple={couple} /> : null}
+  // Skin decorativo da Biblioteca de Layouts (vazio quando nenhum modelo foi aplicado).
+  const skin = siteSkin(sections);
 
-      {ordered.map(({ type, node }) =>
-        visible.has(type) && node ? (
-          <div key={type}>
-            {type === "hero" || type === "dress_code" ? (
-              wrap(type, sectionOf(type), node)
-            ) : (
-              <Reveal>{wrap(type, sectionOf(type), node)}</Reveal>
-            )}
-          </div>
-        ) : null,
-      )}
+  return (
+    <div
+      style={style}
+      className={cn("relative min-h-screen text-neutral-800", skinRootClass(skin))}
+    >
+      <SkinBackdrop skin={skin} />
+      <div className="relative">
+        {visible.has("header") ? <SiteHeader section={headerSection} couple={couple} /> : null}
+
+        {ordered.map(({ type, node }, index) =>
+          visible.has(type) && node ? (
+            <div key={type}>
+              {index > 0 && skin !== "none" && type !== "hero" ? <SkinDivider skin={skin} /> : null}
+              {type === "hero" || type === "dress_code" ? (
+                wrap(type, sectionOf(type), node)
+              ) : (
+                <Reveal>{wrap(type, sectionOf(type), node)}</Reveal>
+              )}
+            </div>
+          ) : null,
+        )}
+      </div>
+
 
       {visible.has("footer") ? (
         <footer className="px-4 py-12 text-center text-sm">
