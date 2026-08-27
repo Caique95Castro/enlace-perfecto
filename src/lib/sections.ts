@@ -405,12 +405,24 @@ export const SECTION_FIELDS: Record<SectionType, FieldDef[]> = {
     },
     { key: "groomsmen_color", label: "Cor — trajes masculinos", type: "color" },
     {
+      key: "groomsmen_color_name",
+      label: "Nome da cor — trajes masculinos",
+      type: "text",
+      placeholder: "Ex: Cinza-chumbo",
+    },
+    {
       key: "bridesmaids_label",
       label: "Rótulo — trajes femininos",
       type: "text",
       placeholder: "Madrinhas",
     },
     { key: "bridesmaids_color", label: "Cor — trajes femininos", type: "color" },
+    {
+      key: "bridesmaids_color_name",
+      label: "Nome da cor — trajes femininos",
+      type: "text",
+      placeholder: "Ex: Terracota",
+    },
     {
       key: "wedding_party_colors_note",
       label: "Observação (opcional)",

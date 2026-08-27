@@ -123,8 +123,10 @@ export function DressCodeSection({
     fieldText(section, "wedding_party_colors_title") || "Cores dos padrinhos e madrinhas";
   const groomsmenLabel = fieldText(section, "groomsmen_label") || "Padrinhos";
   const groomsmenColor = fieldText(section, "groomsmen_color");
+  const groomsmenColorName = fieldText(section, "groomsmen_color_name");
   const bridesmaidsLabel = fieldText(section, "bridesmaids_label") || "Madrinhas";
   const bridesmaidsColor = fieldText(section, "bridesmaids_color");
+  const bridesmaidsColorName = fieldText(section, "bridesmaids_color_name");
   const partyColorsNote = fieldText(section, "wedding_party_colors_note");
   const hasPartyColors = showPartyColors && Boolean(groomsmenColor || bridesmaidsColor);
 
@@ -228,9 +230,19 @@ export function DressCodeSection({
         <div className="mt-8 w-full max-w-xl">
           <p className="text-sm font-semibold">{partyColorsTitle}</p>
           <div className="mt-3 flex flex-wrap gap-4">
-            {groomsmenColor ? <ColorSwatch label={groomsmenLabel} color={groomsmenColor} /> : null}
+            {groomsmenColor ? (
+              <ColorSwatch
+                label={groomsmenLabel}
+                color={groomsmenColor}
+                colorName={groomsmenColorName}
+              />
+            ) : null}
             {bridesmaidsColor ? (
-              <ColorSwatch label={bridesmaidsLabel} color={bridesmaidsColor} />
+              <ColorSwatch
+                label={bridesmaidsLabel}
+                color={bridesmaidsColor}
+                colorName={bridesmaidsColorName}
+              />
             ) : null}
           </div>
           {partyColorsNote ? <p className="mt-3 text-sm opacity-80">{partyColorsNote}</p> : null}
@@ -301,7 +313,15 @@ export function DressCodeSection({
   );
 }
 
-function ColorSwatch({ label, color }: { label: string; color: string }) {
+function ColorSwatch({
+  label,
+  color,
+  colorName,
+}: {
+  label: string;
+  color: string;
+  colorName?: string;
+}) {
   return (
     <div className="flex items-center gap-2.5">
       <span
@@ -311,7 +331,15 @@ function ColorSwatch({ label, color }: { label: string; color: string }) {
       />
       <div className="text-left">
         <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs uppercase opacity-60">{color}</p>
+        <p className="text-xs opacity-60">
+          {colorName ? (
+            <>
+              {colorName} <span className="uppercase">({color})</span>
+            </>
+          ) : (
+            <span className="uppercase">{color}</span>
+          )}
+        </p>
       </div>
     </div>
   );
