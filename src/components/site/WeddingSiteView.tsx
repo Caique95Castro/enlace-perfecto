@@ -33,6 +33,7 @@ import { SkinBackdrop, SkinDivider, skinRootClass } from "@/components/site/Layo
 
 import { Reveal } from "@/components/site/Reveal";
 import { GalleryCarousel } from "@/components/site/GalleryCarousel";
+import { WeatherCard } from "@/components/site/WeatherCard";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import type { SectionType, WebsiteSection } from "@/types";
 
@@ -426,6 +427,17 @@ export function WeddingSiteView({
     [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ");
   const eventTime = fieldText(eventSection, "time") || formatTime(wedding?.ceremony_time ?? null);
   const eventMap = fieldText(eventSection, "map_url");
+  const venuePhotos = ["venue_photo_1", "venue_photo_2", "venue_photo_3", "venue_photo_4"]
+    .map((k) => fieldText(eventSection, k))
+    .filter(Boolean)
+    .map((url, i) => ({ id: `venue-${i}`, url, caption: null }));
+  const venuePhotosRatio = fieldChoice(eventSection, "venue_photos_ratio", "paisagem");
+  const venueRatioClass =
+    venuePhotosRatio === "quadrado"
+      ? "aspect-square"
+      : venuePhotosRatio === "retrato"
+        ? "aspect-[3/4]"
+        : "aspect-[16/9]";
 
   const eventBlock = (
     <Section
@@ -457,6 +469,38 @@ export function WeddingSiteView({
           ) : null}
         </div>
       </div>
+      {venuePhotos.length > 0 ? (
+        <div className="mx-auto mt-10 max-w-4xl">
+          {fieldChoice(eventSection, "venue_photos_mode", "grade") === "carrossel" ? (
+            <GalleryCarousel
+              photos={venuePhotos}
+              coupleName={eventVenue || couple.display_name}
+              perView={1}
+              ratio={venuePhotosRatio}
+              loop
+            />
+          ) : (
+            <div
+              className={cn(
+                "grid gap-3",
+                venuePhotos.length === 1 ? "grid-cols-1" : "grid-cols-2",
+                venuePhotos.length >= 3 && "sm:grid-cols-3",
+                venuePhotos.length === 4 && "sm:grid-cols-4",
+              )}
+            >
+              {venuePhotos.map((p, i) => (
+                <img
+                  key={p.id}
+                  src={p.url}
+                  alt={`${eventVenue || "Local do evento"} — foto ${i + 1}`}
+                  loading="lazy"
+                  className={cn("w-full rounded-xl object-cover", venueRatioClass)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
     </Section>
   );
 
@@ -486,6 +530,21 @@ export function WeddingSiteView({
 
   const locationSection = sectionOf("location");
   const locationMap = fieldText(locationSection, "map_url");
+  const locationAddress =
+    fieldText(locationSection, "address") ||
+    [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ");
+  const locationVenue = fieldText(locationSection, "venue_name") || wedding?.venue_name || "";
+  const hasCoords = wedding?.latitude != null && wedding?.longitude != null;
+  const mapQuery = hasCoords
+    ? `${wedding!.latitude},${wedding!.longitude}`
+    : [locationVenue, locationAddress].filter(Boolean).join(", ");
+  const mapHeight = {
+    baixo: "h-56",
+    medio: "h-72 sm:h-80",
+    alto: "h-96 sm:h-[28rem]",
+  }[fieldChoice(locationSection, "map_height", "medio")];
+  const showMap = fieldBool(locationSection, "show_map", true) && Boolean(mapQuery);
+  const showWeather = fieldBool(locationSection, "show_weather", true);
   const locationBlock = (
     <Section
       id="local"
@@ -496,13 +555,29 @@ export function WeddingSiteView({
         frame={sectionFrame(locationSection)}
     >
       <div className="text-center">
-        <p className="font-medium">
-          {fieldText(locationSection, "venue_name") || wedding?.venue_name || "Local a definir"}
-        </p>
-        <p className="mt-1 text-sm">
-          {fieldText(locationSection, "address") ||
-            [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ")}
-        </p>
+        <p className="font-medium">{locationVenue || "Local a definir"}</p>
+        <p className="mt-1 text-sm">{locationAddress}</p>
+        {showMap ? (
+          <div className={cn("mx-auto mt-6 w-full max-w-3xl overflow-hidden rounded-2xl shadow-sm", mapHeight)}>
+            <iframe
+              title={`Mapa: ${locationVenue || locationAddress}`}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=${fieldChoice(locationSection, "map_zoom", "15")}&hl=pt-BR&output=embed`}
+              className="size-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+        ) : null}
+        {showWeather ? (
+          <WeatherCard
+            date={wedding?.wedding_date}
+            address={locationAddress}
+            latitude={wedding?.latitude}
+            longitude={wedding?.longitude}
+            primary={settings.primary_color}
+          />
+        ) : null}
         {locationMap ? (
           <a
             href={locationMap}
