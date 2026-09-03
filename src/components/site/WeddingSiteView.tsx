@@ -69,6 +69,9 @@ export type WeddingSiteData = {
     state: string | null;
     dress_code: string | null;
     description: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+
   } | null;
   settings: {
     primary_color: string;
