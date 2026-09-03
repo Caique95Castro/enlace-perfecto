@@ -18,7 +18,12 @@ export type WeatherResult =
     }
   | { ok: false; reason: "no_location" | "no_date" | "unavailable" };
 
-type Input = { date: string; address?: string; latitude?: number; longitude?: number };
+type Input = {
+  date: string;
+  address?: string | undefined;
+  latitude?: number | undefined;
+  longitude?: number | undefined;
+};
 
 const WMO: Record<number, { label: string; tip: string }> = {
   0: { label: "Céu limpo", tip: "Dia ensolarado — vale levar óculos de sol." },
