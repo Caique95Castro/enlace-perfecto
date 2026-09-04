@@ -51,12 +51,23 @@ function describe(code: number) {
 }
 
 async function geocode(address: string): Promise<{ lat: number; lon: number; name: string } | null> {
-  // Tenta o endereço completo e, se não achar, apenas as últimas partes (cidade/estado).
+  // Tenta o endereço completo e, se não achar, variações de cidade/estado.
   const parts = address.split(",").map((p) => p.trim()).filter(Boolean);
-  const attempts = [address, parts.slice(-2).join(", "), parts.slice(-1).join(", ")].filter(
-    (v, i, a) => v && a.indexOf(v) === i,
-  );
-  for (const q of attempts) {
+  const cityState = parts.find((p) => /\s+-\s+\w{2}$/.test(p));
+  const cityOnly = cityState ? cityState.replace(/\s+-\s+\w{2}$/, "").trim() : null;
+  const state = cityState ? cityState.match(/-(\w{2})$/)?.[1] : null;
+
+  const attempts = [
+    address,
+    parts.slice(-2).join(", "),
+    cityState,
+    cityOnly,
+    cityOnly && state ? `${cityOnly}, ${state}` : null,
+    parts.slice(-1).join(", "),
+  ].filter((v): v is string => Boolean(v));
+  const unique = attempts.filter((v, i, a) => a.indexOf(v) === i);
+
+  for (const q of unique) {
     const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=pt&format=json`;
     const res = await fetch(url);
     if (!res.ok) continue;

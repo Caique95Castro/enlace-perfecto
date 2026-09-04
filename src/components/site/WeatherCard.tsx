@@ -26,8 +26,8 @@ export function WeatherCard({
 }: {
   date: string | null | undefined;
   address: string;
-  latitude?: number | null;
-  longitude?: number | null;
+  latitude?: number | null | undefined;
+  longitude?: number | null | undefined;
   primary: string;
 }) {
   const fetchWeather = useServerFn(getWeddingWeather);
