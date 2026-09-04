@@ -32,8 +32,10 @@ export function WeatherCard({
 }) {
   const fetchWeather = useServerFn(getWeddingWeather);
   const enabled = Boolean(date) && (Boolean(address) || (latitude != null && longitude != null));
+  // eslint-disable-next-line no-console
+  console.log("[WeatherCard] enabled:", enabled, "date:", date, "address:", address, "lat:", latitude, "lon:", longitude);
 
-  const { data, isLoading } = useQuery<WeatherResult>({
+  const { data, isLoading, error } = useQuery<WeatherResult>({
     queryKey: ["weather", date, address, latitude, longitude],
     queryFn: () =>
       fetchWeather({
@@ -48,6 +50,8 @@ export function WeatherCard({
     staleTime: 1000 * 60 * 60,
     retry: 1,
   });
+  // eslint-disable-next-line no-console
+  console.log("[WeatherCard] data:", data, "isLoading:", isLoading, "error:", error);
 
   if (!enabled) return null;
 
