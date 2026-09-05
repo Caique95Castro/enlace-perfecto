@@ -304,6 +304,7 @@ function GiftsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       }
     >
       {isLoading ? (
