@@ -543,7 +543,7 @@ export function WeddingSiteView({
     baixo: "h-56",
     medio: "h-72 sm:h-80",
     alto: "h-96 sm:h-[28rem]",
-  }[fieldChoice(locationSection, "map_height", "medio")];
+  }[fieldChoice(locationSection, "map_height", "medio")] ?? "h-72 sm:h-80";
   const showMap = fieldBool(locationSection, "show_map", true) && Boolean(mapQuery);
   const showWeather = fieldBool(locationSection, "show_weather", true);
   const locationBlock = (
