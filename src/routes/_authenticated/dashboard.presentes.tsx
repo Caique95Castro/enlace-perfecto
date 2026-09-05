@@ -314,6 +314,11 @@ function GiftsPage() {
           icon={Gift}
           title="Sua lista está vazia"
           description="Adicione produtos ou cotas de lua de mel para seus convidados presentearem."
+          action={
+            <Button onClick={() => setCatalogOpen(true)}>
+              <LibraryBig className="size-4" /> Usar catálogo pronto
+            </Button>
+          }
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
