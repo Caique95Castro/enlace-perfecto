@@ -566,6 +566,25 @@ export function WeddingSiteView({
             heightClass={mapHeight}
           />
         ) : null}
+        {locationMap || mapQuery ? (
+          <a
+            href={locationMap || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-5 inline-block"
+          >
+            <Button
+              size="lg"
+              style={{
+                backgroundColor: settings.primary_color,
+                borderColor: settings.primary_color,
+                color: "#fff",
+              }}
+            >
+              Como chegar
+            </Button>
+          </a>
+        ) : null}
         {showWeather ? (
           <WeatherCard
             date={wedding?.wedding_date}
@@ -574,16 +593,6 @@ export function WeddingSiteView({
             longitude={wedding?.longitude}
             primary={settings.primary_color}
           />
-        ) : null}
-        {locationMap || mapQuery ? (
-          <a
-            href={locationMap || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-block text-sm underline"
-          >
-            Como chegar
-          </a>
         ) : null}
       </div>
     </Section>
