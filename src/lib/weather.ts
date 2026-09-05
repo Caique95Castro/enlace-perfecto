@@ -50,7 +50,7 @@ function describe(code: number) {
   return WMO[code] ?? WMO[Math.floor(code / 10) * 10] ?? { label: "Tempo variável", tip: "Fique de olho na previsão perto da data." };
 }
 
-async function geocode(address: string): Promise<{ lat: number; lon: number; name: string } | null> {
+export async function geocodeAddress(address: string): Promise<{ lat: number; lon: number; name: string } | null> {
   // Tenta o endereço completo e, se não achar, variações de cidade/estado.
   const parts = address.split(",").map((p) => p.trim()).filter(Boolean);
   const cityState = parts.find((p) => /\s+-\s+\w{2}$/.test(p));
@@ -100,7 +100,7 @@ export async function fetchWeatherForDate(input: Input): Promise<WeatherResult> 
   let lon = input.longitude;
   let place: string | null = null;
   if ((lat == null || lon == null) && input.address) {
-    const geo = await geocode(input.address).catch(() => null);
+    const geo = await geocodeAddress(input.address).catch(() => null);
     if (geo) {
       lat = geo.lat;
       lon = geo.lon;
