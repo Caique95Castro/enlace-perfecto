@@ -54,6 +54,8 @@ function GiftsPage() {
   const { data: couple } = useCouple();
   const { data: gifts = [], isLoading } = useGifts(couple?.id);
   const [open, setOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -90,11 +92,135 @@ function GiftsPage() {
     }
   }
 
+  const existingNames = new Set(gifts.map((g) => g.name.toLowerCase()));
+
+  async function addFromCatalog(items: CatalogGift[]) {
+    if (!couple || items.length === 0) return;
+    setSaving(true);
+    try {
+      for (const item of items) {
+        const { key: _key, category: _category, ...input } = item;
+        await createGift(couple.id, input);
+      }
+      await queryClient.invalidateQueries({ queryKey: ["gifts", couple.id] });
+      toast.success(
+        items.length === 1 ? "Presente adicionado." : `${items.length} presentes adicionados.`,
+      );
+      setCatalogOpen(false);
+      setSelected(new Set());
+    } catch {
+      toast.error("Não foi possível adicionar os presentes.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <DashboardLayout
       title="Lista de presentes"
       description="Produtos e cotas que seus convidados podem presentear."
       actions={
+        <div className="flex flex-wrap gap-2">
+        <Dialog open={catalogOpen} onOpenChange={setCatalogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" disabled={!couple}>
+              <LibraryBig className="size-4" /> Catálogo pronto
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Catálogo de presentes</DialogTitle>
+              <DialogDescription>
+                Selecione os itens que deseja adicionar. Você pode editar valores e quantidades depois.
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] pr-3">
+              <div className="space-y-6">
+                {CATALOG_CATEGORIES.map((cat) => (
+                  <section key={cat} className="space-y-3">
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {cat}
+                    </h4>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {GIFT_CATALOG.filter((g) => g.category === cat).map((item) => {
+                        const already = existingNames.has(item.name.toLowerCase());
+                        const checked = selected.has(item.key);
+                        return (
+                          <label
+                            key={item.key}
+                            className={cn(
+                              "flex cursor-pointer gap-3 rounded-lg border border-border p-2 transition-colors hover:bg-secondary/50",
+                              checked && "border-primary bg-secondary/60",
+                              already && "opacity-60",
+                            )}
+                          >
+                            <img
+                              src={item.image_url ?? ""}
+                              alt={item.name}
+                              width={800}
+                              height={600}
+                              loading="lazy"
+                              className="size-20 shrink-0 rounded-md object-cover"
+                            />
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-medium leading-tight">{item.name}</p>
+                                <Checkbox
+                                  checked={checked}
+                                  onCheckedChange={(v) =>
+                                    setSelected((s) => {
+                                      const next = new Set(s);
+                                      if (v) next.add(item.key);
+                                      else next.delete(item.key);
+                                      return next;
+                                    })
+                                  }
+                                  aria-label={`Selecionar ${item.name}`}
+                                />
+                              </div>
+                              <p className="line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
+                              <p className="text-sm font-semibold">
+                                {formatCurrency(item.price)}
+                                {item.type === "quota" ? (
+                                  <span className="ml-1 text-xs font-normal text-muted-foreground">
+                                    · cota ({item.quantity})
+                                  </span>
+                                ) : null}
+                              </p>
+                              {already ? (
+                                <p className="flex items-center gap-1 text-xs text-primary">
+                                  <Check className="size-3" /> Já está na sua lista
+                                </p>
+                              ) : null}
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </ScrollArea>
+            <DialogFooter className="gap-2 sm:justify-between">
+              <Button
+                variant="ghost"
+                disabled={saving}
+                onClick={() =>
+                  addFromCatalog(GIFT_CATALOG.filter((g) => !existingNames.has(g.name.toLowerCase())))
+                }
+              >
+                Adicionar todos os que faltam
+              </Button>
+              <Button
+                disabled={saving || selected.size === 0}
+                onClick={() => addFromCatalog(GIFT_CATALOG.filter((g) => selected.has(g.key)))}
+              >
+                {saving ? <Loader2 className="size-4 animate-spin" /> : null}
+                Adicionar selecionados ({selected.size})
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button disabled={!couple}>
