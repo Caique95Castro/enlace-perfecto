@@ -1,0 +1,133 @@
+import type { GiftInput } from "@/services/gifts";
+
+export type CatalogGift = GiftInput & {
+  /** Identificador estável do item do catálogo. */
+  key: string;
+  category: "Cozinha" | "Casa" | "Eletro" | "Experiências";
+};
+
+/** Presentes prontos que o casal pode adicionar à lista com um clique. */
+export const GIFT_CATALOG: CatalogGift[] = [
+  {
+    key: "air-fryer",
+    category: "Eletro",
+    name: "Air Fryer Digital 5L",
+    description: "Fritadeira sem óleo com painel digital e cesto antiaderente para refeições rápidas e saudáveis a dois.",
+    image_url: "/gifts/air-fryer.jpg",
+    price: 549.9,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "jogo-jantar",
+    category: "Cozinha",
+    name: "Aparelho de Jantar 20 peças",
+    description: "Porcelana branca com filete dourado: pratos rasos, fundos, de sobremesa e bowls para receber bem.",
+    image_url: "/gifts/jogo-jantar.jpg",
+    price: 689,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "tacas",
+    category: "Cozinha",
+    name: "Conjunto de Taças de Cristal",
+    description: "Seis taças de cristal lapidado para brindar os melhores momentos do novo lar.",
+    image_url: "/gifts/tacas.jpg",
+    price: 259.9,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "panelas",
+    category: "Cozinha",
+    name: "Jogo de Panelas Antiaderentes",
+    description: "Cinco peças em cerâmica antiaderente com cabos de toque frio — leves, bonitas e fáceis de limpar.",
+    image_url: "/gifts/panelas.jpg",
+    price: 799,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "roupa-cama",
+    category: "Casa",
+    name: "Jogo de Cama Queen 400 fios",
+    description: "Algodão egípcio percal 400 fios: lençol, elástico e duas fronhas para noites de sono perfeitas.",
+    image_url: "/gifts/roupa-cama.jpg",
+    price: 459,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "toalhas",
+    category: "Casa",
+    name: "Jogo de Toalhas de Banho",
+    description: "Quatro toalhas de banho e quatro de rosto em algodão felpudo, macias e absorventes.",
+    image_url: "/gifts/toalhas.jpg",
+    price: 289.9,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "cafeteira",
+    category: "Eletro",
+    name: "Cafeteira Espresso",
+    description: "Máquina de espresso com vaporizador de leite para cafés e cappuccinos dignos de cafeteria em casa.",
+    image_url: "/gifts/cafeteira.jpg",
+    price: 899,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "batedeira",
+    category: "Eletro",
+    name: "Batedeira Planetária",
+    description: "Batedeira planetária de 5 litros com batedor, gancho e globo — ideal para bolos e pães de fim de semana.",
+    image_url: "/gifts/batedeira.jpg",
+    price: 1299,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "robo-aspirador",
+    category: "Eletro",
+    name: "Robô Aspirador Inteligente",
+    description: "Aspira e passa pano sozinho, com mapeamento inteligente e controle pelo celular.",
+    image_url: "/gifts/robo-aspirador.jpg",
+    price: 1899,
+    type: "physical",
+    quantity: 1,
+  },
+  {
+    key: "lua-de-mel",
+    category: "Experiências",
+    name: "Cota Lua de Mel",
+    description: "Ajude a realizar a viagem dos sonhos! Cada cota contribui com a hospedagem e os passeios do casal.",
+    image_url: "/gifts/lua-de-mel.jpg",
+    price: 200,
+    type: "quota",
+    quantity: 50,
+  },
+  {
+    key: "jantar-romantico",
+    category: "Experiências",
+    name: "Jantar Romântico",
+    description: "Um jantar especial a dois para celebrar a primeira semana de casados.",
+    image_url: "/gifts/jantar-romantico.jpg",
+    price: 350,
+    type: "quota",
+    quantity: 5,
+  },
+  {
+    key: "spa-casal",
+    category: "Experiências",
+    name: "Dia de Spa para o Casal",
+    description: "Massagem relaxante e day use em spa para os noivos recarregarem as energias depois da festa.",
+    image_url: "/gifts/spa-casal.jpg",
+    price: 480,
+    type: "quota",
+    quantity: 4,
+  },
+];
+
+export const CATALOG_CATEGORIES = ["Cozinha", "Casa", "Eletro", "Experiências"] as const;
