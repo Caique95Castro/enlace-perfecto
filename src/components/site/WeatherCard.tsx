@@ -56,12 +56,20 @@ export function WeatherCard({
       <div className="mx-auto mt-6 h-24 max-w-md animate-pulse rounded-2xl border border-current/10 bg-white/40" />
     );
   }
-  if (!data || !data.ok) return null;
+  if (!data || !data.ok) {
+    return (
+      <div className="mx-auto mt-6 max-w-md rounded-lg border border-current/20 bg-background/90 p-5 text-center text-foreground shadow-sm">
+        <CloudSun className="mx-auto size-8 opacity-70" />
+        <p className="mt-2 text-sm font-medium">Previsão do tempo temporariamente indisponível</p>
+        <p className="mt-1 text-xs opacity-70">Tente novamente em alguns instantes.</p>
+      </div>
+    );
+  }
 
   const Icon = iconFor(data.code);
 
   return (
-    <div className="mx-auto mt-6 max-w-md rounded-2xl border border-current/10 bg-white/50 p-5 text-left shadow-sm backdrop-blur-sm">
+    <div className="mx-auto mt-6 max-w-md rounded-lg border border-current/20 bg-background/90 p-5 text-left text-foreground shadow-sm backdrop-blur-sm">
       <p className="text-xs uppercase tracking-[0.2em] opacity-70">
         {data.kind === "forecast" ? "Como vai estar o tempo" : "Média histórica para esta data"}
       </p>

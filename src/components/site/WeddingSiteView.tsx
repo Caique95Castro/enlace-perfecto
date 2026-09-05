@@ -34,6 +34,7 @@ import { SkinBackdrop, SkinDivider, skinRootClass } from "@/components/site/Layo
 import { Reveal } from "@/components/site/Reveal";
 import { GalleryCarousel } from "@/components/site/GalleryCarousel";
 import { WeatherCard } from "@/components/site/WeatherCard";
+import { VenueMap } from "@/components/site/VenueMap";
 import { useGoogleFonts } from "@/hooks/useGoogleFonts";
 import type { SectionType, WebsiteSection } from "@/types";
 
@@ -537,15 +538,12 @@ export function WeddingSiteView({
     fieldText(locationSection, "address") ||
     [wedding?.venue_address, wedding?.city, wedding?.state].filter(Boolean).join(", ");
   const locationVenue = fieldText(locationSection, "venue_name") || wedding?.venue_name || "";
-  const hasCoords = wedding?.latitude != null && wedding?.longitude != null;
-  const mapQuery = hasCoords
-    ? `${wedding!.latitude},${wedding!.longitude}`
-    : [locationVenue, locationAddress].filter(Boolean).join(", ");
+  const mapQuery = [locationVenue, locationAddress].filter(Boolean).join(", ");
   const mapHeight = {
     baixo: "h-56",
     medio: "h-72 sm:h-80",
     alto: "h-96 sm:h-[28rem]",
-  }[fieldChoice(locationSection, "map_height", "medio")];
+  }[fieldChoice(locationSection, "map_height", "medio")] ?? "h-72 sm:h-80";
   const showMap = fieldBool(locationSection, "show_map", true) && Boolean(mapQuery);
   const showWeather = fieldBool(locationSection, "show_weather", true);
   const locationBlock = (
@@ -561,16 +559,12 @@ export function WeddingSiteView({
         <p className="font-medium">{locationVenue || "Local a definir"}</p>
         <p className="mt-1 text-sm">{locationAddress}</p>
         {showMap ? (
-          <div className={cn("mx-auto mt-6 w-full max-w-3xl overflow-hidden rounded-2xl shadow-sm", mapHeight)}>
-            <iframe
-              title={`Mapa: ${locationVenue || locationAddress}`}
-              src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=${fieldChoice(locationSection, "map_zoom", "15")}&hl=pt-BR&output=embed`}
-              className="size-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-          </div>
+          <VenueMap
+            address={mapQuery}
+            latitude={wedding?.latitude}
+            longitude={wedding?.longitude}
+            heightClass={mapHeight}
+          />
         ) : null}
         {showWeather ? (
           <WeatherCard
@@ -581,9 +575,9 @@ export function WeddingSiteView({
             primary={settings.primary_color}
           />
         ) : null}
-        {locationMap ? (
+        {locationMap || mapQuery ? (
           <a
-            href={locationMap}
+            href={locationMap || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
             target="_blank"
             rel="noreferrer"
             className="mt-3 inline-block text-sm underline"
