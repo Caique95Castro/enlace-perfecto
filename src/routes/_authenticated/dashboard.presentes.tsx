@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Gift, Loader2, Plus, Trash2 } from "lucide-react";
+import { Check, Gift, LibraryBig, Loader2, Plus, Trash2 } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -30,6 +33,8 @@ import {
 import { useCouple, useGifts } from "@/hooks/useWeddingData";
 import { createGift, deleteGift, updateGift } from "@/services/gifts";
 import { formatCurrency } from "@/lib/format";
+import { CATALOG_CATEGORIES, GIFT_CATALOG, type CatalogGift } from "@/lib/gift-catalog";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard/presentes")({
   head: () => ({
